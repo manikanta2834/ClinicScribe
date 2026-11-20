@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClinicScribe — Liquid Metal Warm Chrome Studio</title>
+  <style>
+    :root {
+      --bg-cream: #FFF6E9;
+      --brand-teal: #075D55;
+      --brand-orange: #F28C38;
+      --brand-tagline: #169785;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-border: rgba(7, 93, 85, 0.15);
+      --text-main: #1C2E2A;
+      --text-muted: #4B635E;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-cream);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background-color 0.3s ease;
+    }
+    body.dark-bg {
+      background-color: #053D37;
+      color: #FFF6E9;
+      --card-bg: rgba(5, 45, 40, 0.85);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --text-main: #FFF6E9;
+      --text-muted: #A3C9C4;
+    }
+    body.checker-bg {
+      background-color: #e5e5e5;
+      background-image: 
+        linear-gradient(45deg, #ccc 25%, transparent 25%), 
+        linear-gradient(-45deg, #ccc 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #ccc 75%), 
+        linear-gradient(-45deg, transparent 75%, #ccc 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
+    }
+
+    header {
+      width: 100%;
+      max-width: 1200px;
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(242, 140, 56, 0.15);
+      color: #C86518;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(242, 140, 56, 0.3);
+    }
+    body.dark-bg .header-badge {
+      background: rgba(242, 140, 56, 0.25);
+      color: #FFAA66;
+    }
+
+    .main-container {
+      width: 100%;
+      max-width: 1200px;
+      padding: 0 32px 48px;
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 40px;
+    }
+    @media (max-width: 960px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Left Stage */
+    .stage-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      box-shadow: 0 20px 40px -15px rgba(7, 93, 85, 0.08);
+    }
+    .canvas-wrapper {
+      position: relative;
+      width: 440px;
+      height: 440px;
+      max-width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      filter: drop-shadow(0 18px 30px rgba(40, 20, 5, 0.18));
+    }
+
+    /* Header Lockup Live Demo */
+    .lockup-section {
+      width: 100%;
+      border-top: 1px solid var(--card-border);
+      padding-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .lockup-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+    .header-lockup-demo {
+      display: inline-flex;
+      align-items: center;
+      gap: 18px;
+      padding: 18px 28px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      width: fit-content;
+    }
+    body.dark-bg .header-lockup-demo {
+      background: rgba(0, 0, 0, 0.25);
+    }
+    .lockup-icon-mini {
+      width: 60px;
+      height: 60px;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .lockup-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .lockup-wordmark {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--brand-teal);
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+    body.dark-bg .lockup-wordmark {
+      color: #FFF6E9;
+    }
+    .lockup-tagline {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--brand-tagline);
+      letter-spacing: 1.8px;
+      margin-top: 3px;
+    }
+    body.dark-bg .lockup-tagline {
+      color: #42D8C3;
+    }
+
+    /* Controls Panel */
+    .controls-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      box-shadow: 0 20px 40px -15px rgba(7, 93, 85, 0.08);
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+    .panel-section-title {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .preset-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .preset-btn {
+      padding: 10px 8px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    body.dark-bg .preset-btn {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .preset-btn.active {
+      background: var(--brand-orange);
+      color: #FFFFFF;
+      border-color: var(--brand-orange);
+      box-shadow: 0 4px 12px rgba(242, 140, 56, 0.35);
+    }
+
+    .bg-toggles {
+      display: flex;
+      gap: 8px;
+    }
+    .bg-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.6);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    body.dark-bg .bg-btn {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .bg-btn.active {
+      background: var(--brand-teal);
+      color: #FFFFFF;
+      border-color: var(--brand-teal);
+    }
+
+    .control-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .control-val {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      color: var(--brand-orange);
+      font-weight: 700;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(7, 93, 85, 0.2);
+      outline: none;
+      transition: background 0.2s;
+    }
+    body.dark-bg input[type="range"] {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--brand-orange);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    .color-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .color-picker-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+    .color-picker-wrap input[type="color"] {
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      background: transparent;
+    }
+
+    .export-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .export-btn {
+      padding: 14px;
+      border-radius: 14px;
+      background: var(--brand-teal);
+      color: #FFFFFF;
+      border: none;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(7, 93, 85, 0.25);
+    }
+    .export-btn:hover {
+      background: #0A7268;
+      transform: translateY(-1px);
+    }
+    .export-btn.secondary {
+      background: rgba(242, 140, 56, 0.15);
+      color: #C86518;
+      box-shadow: none;
+      border: 1px solid rgba(242, 140, 56, 0.3);
+    }
+    body.dark-bg .export-btn.secondary {
+      color: #FFAA66;
+    }
+    .status-msg {
+      font-size: 11px;
+      text-align: center;
+      color: var(--text-muted);
+      min-height: 16px;
+    }
+  </style>
+</head>
+<body id="bodyEl">
+  <header>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <h1 style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">ClinicScribe Liquid Metal</h1>
+      <span class="header-badge">Warm Chrome Studio</span>
+    </div>
+    <div class="bg-toggles">
+      <button class="bg-btn active" id="bgCreamBtn" onclick="setBgMode('cream')">Cream</button>
+      <button class="bg-btn" id="bgAlphaBtn" onclick="setBgMode('alpha')">Transparent</button>
+      <button class="bg-btn" id="bgDarkBtn" onclick="setBgMode('dark')">Teal Dark</button>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <!-- Left: Canvas stage & Lockup demo -->
+    <div class="stage-card">
+      <div class="canvas-wrapper">
+        <canvas id="webglCanvas" width="1080" height="1080"></canvas>
+      </div>
+
+      <!-- Live Header Lockup -->
+      <div class="lockup-section">
+        <div class="lockup-title">Header Lockup Preview (Animated Icon + Static Typography)</div>
+        <div class="header-lockup-demo">
+          <div class="lockup-icon-mini">
+            <!-- Secondary mirror canvas for header lockup -->
+            <canvas id="miniCanvas" width="240" height="240" style="width:100%; height:100%;"></canvas>
+          </div>
+          <div class="lockup-text">
+            <span class="lockup-wordmark">ClinicScribe</span>
+            <span class="lockup-tagline">TURNING CONVERSATIONS INTO CARE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Parameter controls -->
+    <div class="controls-card">
+      <div>
+        <div class="panel-section-title">Colorway Variants</div>
+        <div class="preset-buttons">
+          <button class="preset-btn" id="btnSubtle" onclick="applyPreset('subtle')">Subtle</button>
+          <button class="preset-btn active" id="btnBalanced" onclick="applyPreset('balanced')">Balanced ★</button>
+          <button class="preset-btn" id="btnBold" onclick="applyPreset('bold')">Bold</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel-section-title">Color Palette</div>
+        <div class="color-row">
+          <div class="color-picker-wrap">
+            <input type="color" id="tintColorInput" value="#F28C38" onchange="updateColors()">
+            <div>
+              <div style="font-size:12px; font-weight:700;">Highlight Tint</div>
+              <div style="font-size:10px; color:var(--text-muted);" id="tintColorHex">#F28C38</div>
+            </div>
+          </div>
+          <div class="color-picker-wrap">
+            <input type="color" id="backColorInput" value="#D4AF77" onchange="updateColors()">
+            <div>
+              <div style="font-size:12px; font-weight:700;">Base Bronze</div>
+              <div style="font-size:10px; color:var(--text-muted);" id="backColorHex">#D4AF77</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel-section-title">Shader Motion & Shape Tuning</div>
+        
+        <div class="control-row">
+          <div class="control-header">
+            <span>Repetition (Scale)</span>
+            <span class="control-val" id="valRepetition">3.0</span>
+          </div>
+          <input type="range" id="paramRepetition" min="1.0" max="8.0" step="0.1" value="3.0" oninput="updateParams()">
+        </div>
+
+        <div class="control-row">
+          <div class="control-header">
+            <span>Softness (Blur)</span>
+            <span class="control-val" id="valSoftness">0.022</span>
+          </div>
+          <input type="range" id="paramSoftness" min="0.002" max="0.060" step="0.001" value="0.022" oninput="updateParams()">
+        </div>
+
+        <div class="control-row">
+          <div class="control-header">
+            <span>Distortion (Refraction)</span>
+            <span class="control-val" id="valDistortion">0.028</span>
+          </div>
+          <input type="range" id="paramDistortion" min="0.000" max="0.060" step="0.001" value="0.028" oninput="updateParams()">
+        </div>
+
+        <div class="control-row">
+          <div class="control-header">
+            <span>Contour (Edge Bevel)</span>
+            <span class="control-val" id="valContour">0.42</span>
+          </div>
+          <input type="range" id="paramContour" min="0.00" max="1.00" step="0.01" value="0.42" oninput="updateParams()">
+        </div>
+
+        <div class="control-row">
+          <div class="control-header">
+            <span>Red Shift (Warm Aberration)</span>
+            <span class="control-val" id="valShiftRed">+0.15</span>
+          </div>
+          <input type="range" id="paramShiftRed" min="-0.30" max="0.50" step="0.01" value="0.15" oninput="updateParams()">
+        </div>
+
+        <div class="control-row">
+          <div class="control-header">
+            <span>Blue Shift (Kill Blue Fringe)</span>
+            <span class="control-val" id="valShiftBlue">-0.02</span>
+          </div>
+          <input type="range" id="paramShiftBlue" min="-0.30" max="0.30" step="0.01" value="-0.02" oninput="updateParams()">
+        </div>
+
+        <div class="control-row">
+          <div class="control-header">
+            <span>Light Angle</span>
+            <span class="control-val" id="valAngle">45°</span>
+          </div>
+          <input type="range" id="paramAngle" min="0" max="360" step="1" value="45" oninput="updateParams()">
+        </div>
+
+        <div class="control-row">
+          <div class="control-header">
+            <span>Speed (Slow Luxury Flow)</span>
+            <span class="control-val" id="valSpeed">0.28</span>
+          </div>
+          <input type="range" id="paramSpeed" min="0.05" max="1.00" step="0.01" value="0.28" oninput="updateParams()">
+        </div>
+      </div>
+
+      <div class="export-actions">
+        <button class="export-btn" id="recordWebmBtn" onclick="recordSeamlessLoop('webm')">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7"/></svg>
+          Export 5s Seamless Loop (WebM Alpha)
+        </button>
+        <button class="export-btn secondary" id="recordPngBtn" onclick="exportStaticFrame()">
+          Export Static 1080p Poster Frame (PNG)
+        </button>
+        <div class="status-msg" id="statusMsg">Ready to export 60 fps seamless loop.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ------------------------------------------------------------------------
+    // Shader Source (Warm Chrome Liquid Metal with Cutout Normal Support)
+    // ------------------------------------------------------------------------
+    const vsSource = `#version 300 es
+    precision mediump float;
+    in vec2 a_position;
+    out vec2 vUv;
+    void main() {
+      vUv = 0.5 * (a_position + 1.0);
+      gl_Position = vec4(a_position, 0.0, 1.0);
+    }`;
+
+    const fsSource = `#version 300 es
+    precision mediump float;
+    in vec2 vUv;
+    out vec4 fragColor;
+
+    uniform sampler2D u_image_texture;
+    uniform float u_time;
+    uniform float u_patternScale;
+    uniform float u_refraction;
+    uniform float u_edge;
+    uniform float u_patternBlur;
+    uniform float u_liquid;
+    uniform float u_angle;
+    uniform float u_shiftRed;
+    uniform float u_shiftBlue;
+    uniform vec3 u_colorTint;
+    uniform vec3 u_colorBack;
+
+    #define TWO_PI 6.28318530718
+    #define PI 3.14159265358979323846
+
+    vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+    vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+    vec3 permute(vec3 x) { return mod289(((x * 34.0) + 1.0) * x); }
+
+    float snoise(vec2 v) {
+      const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+      vec2 i = floor(v + dot(v, C.yy));
+      vec2 x0 = v - i + dot(i, C.xx);
+      vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+      vec4 x12 = x0.xyxy + C.xxzz;
+      x12.xy -= i1;
+      i = mod289(i);
+      vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+      vec3 m = max(0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), 0.0);
+      m = m * m; m = m * m;
+      vec3 x = 2.0 * fract(p * C.www) - 1.0;
+      vec3 h = abs(x) - 0.5;
+      vec3 ox = floor(x + 0.5);
+      vec3 a0 = x - ox;
+      m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
+      vec3 g;
+      g.x = a0.x * x0.x + h.x * x0.y;
+      g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+      return 130.0 * dot(m, g);
+    }
+
+    vec2 rotate(vec2 uv, float th) {
+      return mat2(cos(th), sin(th), -sin(th), cos(th)) * uv;
+    }
+
+    float get_color_channel(float c1, float c2, float stripe_p, vec3 w, float extra_blur, float b) {
+      float ch = c2;
+      float border = 0.0;
+      float blur = u_patternBlur + extra_blur;
+
+      ch = mix(ch, c1, smoothstep(0.0, blur, stripe_p));
+      border = w[0];
+      ch = mix(ch, c2, smoothstep(border - blur, border + blur, stripe_p));
+
+      b = smoothstep(0.2, 0.8, b);
+      border = w[0] + 0.4 * (1.0 - b) * w[1];
+      ch = mix(ch, c1, smoothstep(border - blur, border + blur, stripe_p));
+
+      border = w[0] + 0.5 * (1.0 - b) * w[1];
+      ch = mix(ch, c2, smoothstep(border - blur, border + blur, stripe_p));
+
+      border = w[0] + w[1];
+      ch = mix(ch, c1, smoothstep(border - blur, border + blur, stripe_p));
+
+      float gradient_t = (stripe_p - w[0] - w[1]) / w[2];
+      float gradient = mix(c1, c2, smoothstep(0.0, 1.0, gradient_t));
+      ch = mix(ch, gradient, smoothstep(border - blur, border + blur, stripe_p));
+      return ch;
+    }
+
+    void main() {
+      vec2 uv = vUv;
+      uv.y = 1.0 - uv.y;
+
+      vec2 img_uv = vUv;
+      img_uv.y = 1.0 - img_uv.y;
+      vec4 img = texture(u_image_texture, img_uv);
+
+      // Distance/bevel is stored in red channel from distance transform
+      float edge = img.r;
+
+      // Outer alpha cutout check
+      float opacity = 1.0 - smoothstep(0.9 - 0.5 * u_edge, 1.0 - 0.5 * u_edge, edge);
+      // Soft boundary edge
+      opacity *= smoothstep(0.0, 0.015, img_uv.x) * smoothstep(1.0, 0.985, img_uv.x);
+      opacity *= smoothstep(0.0, 0.015, img_uv.y) * smoothstep(1.0, 0.985, img_uv.y);
+
+      if (opacity < 0.005) {
+        fragColor = vec4(0.0);
+        return;
+      }
+
+      float diagonal = uv.x - uv.y;
+      
+      // 100% Mathematically Seamless Loop over 5.0 seconds
+      // Using circular noise coordinate embedding and integer cyclic stripe translation
+      float loopPeriod = 5.0;
+      float progress = mod(u_time, loopPeriod) / loopPeriod;
+      float theta = progress * TWO_PI;
+
+      // Color tuning:
+      // Specular highlight: warm cream-white + champagne tint
+      vec3 creamSpecular = vec3(1.0, 0.98, 0.94);
+      vec3 color1 = mix(creamSpecular, u_colorTint, 0.25);
+      // Base reflection: rich amber bronze shadow with copper undertones
+      vec3 color2 = u_colorBack * (0.35 + 0.65 * smoothstep(0.4, 1.2, uv.x + uv.y));
+
+      vec2 grad_uv = uv - 0.5;
+      float dist = length(grad_uv + vec2(0.0, 0.2 * diagonal));
+      grad_uv = rotate(grad_uv, (0.25 - 0.2 * diagonal + u_angle) * PI);
+
+      float bulge = pow(1.8 * dist, 1.2);
+      bulge = 1.0 - bulge;
+      bulge *= pow(uv.y, 0.3);
+
+      float cycle_width = u_patternScale;
+      float thin_strip_1_ratio = 0.12 / cycle_width * (1.0 - 0.4 * bulge);
+      float thin_strip_2_ratio = 0.07 / cycle_width * (1.0 + 0.4 * bulge);
+      float wide_strip_ratio = (1.0 - thin_strip_1_ratio - thin_strip_2_ratio);
+
+      float thin_strip_1_width = cycle_width * thin_strip_1_ratio;
+      float thin_strip_2_width = cycle_width * thin_strip_2_ratio;
+
+      // Seamless circular noise orbit
+      vec2 noiseCoord = uv * 0.85 + vec2(cos(theta), sin(theta)) * 0.35;
+      float noise = snoise(noiseCoord);
+      edge += (1.0 - edge) * u_liquid * noise;
+
+      float refr = clamp(1.0 - bulge, 0.0, 1.0);
+      float dir = grad_uv.x + diagonal;
+      dir -= 2.0 * noise * diagonal * (smoothstep(0.0, 1.0, edge) * smoothstep(1.0, 0.0, edge));
+      bulge *= clamp(pow(uv.y, 0.1), 0.3, 1.0);
+      dir *= (0.1 + (1.1 - edge) * bulge);
+      dir *= smoothstep(1.0, 0.7, edge);
+      dir += 0.18 * (smoothstep(0.1, 0.2, uv.y) * smoothstep(0.4, 0.2, uv.y));
+      dir += 0.03 * (smoothstep(0.1, 0.2, 1.0 - uv.y) * smoothstep(0.4, 0.2, 1.0 - uv.y));
+      dir *= (0.5 + 0.5 * pow(uv.y, 2.0));
+      dir *= cycle_width;
+      
+      // Exactly 1.0 full cycle shift over 5.0 seconds
+      dir -= progress * 1.0;
+
+      // Controlled chromatic shift (warm red highlight, suppressed blue fringe)
+      float refr_r = refr * (1.0 + u_shiftRed) + 0.03 * bulge * noise;
+      refr_r += 5.0 * (smoothstep(-0.1, 0.2, uv.y) * smoothstep(0.5, 0.1, uv.y)) * (smoothstep(0.4, 0.6, bulge) * smoothstep(1.0, 0.4, bulge));
+      refr_r -= diagonal;
+
+      float refr_b = refr * (1.0 + u_shiftBlue);
+      refr_b += (smoothstep(0.0, 0.4, uv.y) * smoothstep(0.8, 0.1, uv.y)) * (smoothstep(0.4, 0.6, bulge) * smoothstep(0.8, 0.4, bulge));
+      refr_b -= 0.2 * edge;
+
+      refr_r *= u_refraction;
+      refr_b *= u_refraction;
+
+      vec3 w = vec3(thin_strip_1_width, thin_strip_2_width, wide_strip_ratio);
+      w[1] -= 0.02 * smoothstep(0.0, 1.0, edge + bulge);
+
+      float stripe_r = mod(dir + refr_r, 1.0);
+      float r = get_color_channel(color1.r, color2.r, stripe_r, w, 0.02 + 0.03 * u_refraction * bulge, bulge);
+
+      float stripe_g = mod(dir, 1.0);
+      float g = get_color_channel(color1.g, color2.g, stripe_g, w, 0.01 / (1.0 - diagonal), bulge);
+
+      float stripe_b = mod(dir - refr_b, 1.0);
+      float b = get_color_channel(color1.b, color2.b, stripe_b, w, 0.01, bulge);
+
+      vec3 finalCol = vec3(r, g, b);
+      fragColor = vec4(finalCol * opacity, opacity);
+    }`;
+
+    // ------------------------------------------------------------------------
+    // WebGL Engine Setup
+    // ------------------------------------------------------------------------
+    const canvas = document.getElementById('webglCanvas');
+    const gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: true });
+    const miniCanvas = document.getElementById('miniCanvas');
+    const miniCtx = miniCanvas.getContext('2d');
+
+    function createShader(gl, src, type) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.error(gl.getShaderInfoLog(s));
+        gl.deleteShader(s);
+        return null;
+      }
+      return s;
+    }
+
+    const prg = gl.createProgram();
+    gl.attachShader(prg, createShader(gl, vsSource, gl.VERTEX_SHADER));
+    gl.attachShader(prg, createShader(gl, fsSource, gl.FRAGMENT_SHADER));
+    gl.linkProgram(prg);
+    gl.useProgram(prg);
+
+    // Quad buffer
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    const posLoc = gl.getAttribLocation(prg, 'a_position');
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+    // Uniform locations
+    const uLocs = {};
+    [
+      'u_time', 'u_patternScale', 'u_refraction', 'u_edge', 'u_patternBlur',
+      'u_liquid', 'u_angle', 'u_shiftRed', 'u_shiftBlue', 'u_colorTint',
+      'u_colorBack', 'u_image_texture'
+    ].forEach(name => {
+      uLocs[name] = gl.getUniformLocation(prg, name);
+    });
+
+    // ------------------------------------------------------------------------
+    // State & Presets
+    // ------------------------------------------------------------------------
+    const presets = {
+      subtle: {
+        repetition: 2.0,
+        softness: 0.035,
+        distortion: 0.018,
+        contour: 0.30,
+        shiftRed: 0.08,
+        shiftBlue: 0.00,
+        angle: 45,
+        speed: 0.20,
+        colorTint: '#FFF3DF',
+        colorBack: '#D8C2A7'
+      },
+      balanced: { // RECOMMENDED
+        repetition: 3.0,
+        softness: 0.022,
+        distortion: 0.028,
+        contour: 0.42,
+        shiftRed: 0.15,
+        shiftBlue: -0.02,
+        angle: 45,
+        speed: 0.28,
+        colorTint: '#F28C38',
+        colorBack: '#D4AF77'
+      },
+      bold: {
+        repetition: 4.2,
+        softness: 0.014,
+        distortion: 0.045,
+        contour: 0.58,
+        shiftRed: 0.25,
+        shiftBlue: -0.06,
+        angle: 55,
+        speed: 0.38,
+        colorTint: '#FFA048',
+        colorBack: '#9E4D1D'
+      }
+    };
+
+    let currentPreset = 'balanced';
+    let params = { ...presets.balanced };
+
+    function hexToRgb(hex) {
+      const num = parseInt(hex.replace('#', ''), 16);
+      return [(num >> 16 & 255) / 255, (num >> 8 & 255) / 255, (num & 255) / 255];
+    }
+
+    function applyPreset(name) {
+      currentPreset = name;
+      params = { ...presets[name] };
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
+
+      document.getElementById('paramRepetition').value = params.repetition;
+      document.getElementById('paramSoftness').value = params.softness;
+      document.getElementById('paramDistortion').value = params.distortion;
+      document.getElementById('paramContour').value = params.contour;
+      document.getElementById('paramShiftRed').value = params.shiftRed;
+      document.getElementById('paramShiftBlue').value = params.shiftBlue;
+      document.getElementById('paramAngle').value = params.angle;
+      document.getElementById('paramSpeed').value = params.speed;
+      document.getElementById('tintColorInput').value = params.colorTint;
+      document.getElementById('backColorInput').value = params.colorBack;
+      updateDisplayValues();
+    }
+
+    function updateParams() {
+      params.repetition = parseFloat(document.getElementById('paramRepetition').value);
+      params.softness = parseFloat(document.getElementById('paramSoftness').value);
+      params.distortion = parseFloat(document.getElementById('paramDistortion').value);
+      params.contour = parseFloat(document.getElementById('paramContour').value);
+      params.shiftRed = parseFloat(document.getElementById('paramShiftRed').value);
+      params.shiftBlue = parseFloat(document.getElementById('paramShiftBlue').value);
+      params.angle = parseFloat(document.getElementById('paramAngle').value);
+      params.speed = parseFloat(document.getElementById('paramSpeed').value);
+      updateDisplayValues();
+    }
+
+    function updateColors() {
+      params.colorTint = document.getElementById('tintColorInput').value;
+      params.colorBack = document.getElementById('backColorInput').value;
+      document.getElementById('tintColorHex').innerText = params.colorTint.toUpperCase();
+      document.getElementById('backColorHex').innerText = params.colorBack.toUpperCase();
+    }
+
+    function updateDisplayValues() {
+      document.getElementById('valRepetition').innerText = params.repetition.toFixed(1);
+      document.getElementById('valSoftness').innerText = params.softness.toFixed(3);
+      document.getElementById('valDistortion').innerText = params.distortion.toFixed(3);
+      document.getElementById('valContour').innerText = params.contour.toFixed(2);
+      document.getElementById('valShiftRed').innerText = (params.shiftRed >= 0 ? '+' : '') + params.shiftRed.toFixed(2);
+      document.getElementById('valShiftBlue').innerText = (params.shiftBlue >= 0 ? '+' : '') + params.shiftBlue.toFixed(2);
+      document.getElementById('valAngle').innerText = Math.round(params.angle) + '°';
+      document.getElementById('valSpeed').innerText = params.speed.toFixed(2);
+      document.getElementById('tintColorHex').innerText = params.colorTint.toUpperCase();
+      document.getElementById('backColorHex').innerText = params.colorBack.toUpperCase();
+    }
+
+    function setBgMode(mode) {
+      const b = document.getElementById('bodyEl');
+      b.classList.remove('dark-bg', 'checker-bg');
+      document.querySelectorAll('.bg-toggles .bg-btn').forEach(btn => btn.classList.remove('active'));
+      if (mode === 'cream') {
+        document.getElementById('bgCreamBtn').classList.add('active');
+      } else if (mode === 'alpha') {
+        b.classList.add('checker-bg');
+        document.getElementById('bgAlphaBtn').classList.add('active');
+      } else if (mode === 'dark') {
+        b.classList.add('dark-bg');
+        document.getElementById('bgDarkBtn').classList.add('active');
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // Build Distance Transform Mask for Cutout Icon
+    // ------------------------------------------------------------------------
+    function generateIconDistanceTexture() {
+      const size = 1024;
+      const oc = document.createElement('canvas');
+      oc.width = size;
+      oc.height = size;
+      const ctx = oc.getContext('2d');
+
+      // Draw solid circle with cut out pulse line
+      const cx = size / 2, cy = size / 2, R = (size / 2) * 0.92;
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cut out pulse line using destination-out
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineWidth = 0.1167 * R;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = '#000000';
+      ctx.beginPath();
+      ctx.moveTo(cx - 0.45 * R, cy);
+      ctx.lineTo(cx - 0.2833 * R, cy);
+      ctx.lineTo(cx - 0.1167 * R, cy - 0.3667 * R);
+      ctx.lineTo(cx + 0.1167 * R, cy + 0.3667 * R);
+      ctx.lineTo(cx + 0.2833 * R, cy);
+      ctx.lineTo(cx + 0.45 * R, cy);
+      ctx.stroke();
+
+      const imgData = ctx.getImageData(0, 0, size, size);
+      const data = imgData.data;
+      
+      // Calculate 8-bit distance field into Red channel
+      // In paper-design liquid shader, R channel holds the edge distance
+      const mask = new Uint8Array(size * size);
+      for (let i = 0; i < size * size; i++) {
+        mask[i] = data[i * 4 + 3] > 128 ? 1 : 0;
+      }
+
+      // Fast approximation for distance transform
+      const dist = new Float32Array(size * size);
+      const INF = 1e6;
+      dist.fill(INF);
+
+      // Pass 1: boundary detection
+      for (let y = 1; y < size - 1; y++) {
+        for (let x = 1; x < size - 1; x++) {
+          const idx = y * size + x;
+          if (mask[idx]) {
+            if (!mask[idx - 1] || !mask[idx + 1] || !mask[idx - size] || !mask[idx + size]) {
+              dist[idx] = 0;
+            }
+          }
+        }
+      }
+
+      // Pass 2: forward distance propagation
+      for (let y = 1; y < size - 1; y++) {
+        for (let x = 1; x < size - 1; x++) {
+          const idx = y * size + x;
+          if (!mask[idx]) continue;
+          dist[idx] = Math.min(dist[idx], dist[idx - 1] + 1, dist[idx - size] + 1, dist[idx - size - 1] + 1.414);
+        }
+      }
+      // Pass 3: backward distance propagation
+      for (let y = size - 2; y >= 1; y--) {
+        for (let x = size - 2; x >= 1; x--) {
+          const idx = y * size + x;
+          if (!mask[idx]) continue;
+          dist[idx] = Math.min(dist[idx], dist[idx + 1] + 1, dist[idx + size] + 1, dist[idx + size + 1] + 1.414);
+        }
+      }
+
+      // Encode normalized distance (bevel depth) into red channel
+      const maxBevel = 42.0;
+      for (let i = 0; i < size * size; i++) {
+        if (mask[i]) {
+          const d = Math.min(1.0, dist[i] / maxBevel);
+          data[i * 4] = Math.round(d * 255);
+          data[i * 4 + 1] = Math.round(d * 255);
+          data[i * 4 + 2] = Math.round(d * 255);
+          data[i * 4 + 3] = 255;
+        } else {
+          data[i * 4] = 0;
+          data[i * 4 + 1] = 0;
+          data[i * 4 + 2] = 0;
+          data[i * 4 + 3] = 0;
+        }
+      }
+
+      ctx.putImageData(imgData, 0, 0);
+
+      // Upload to WebGL
+      const tex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, oc);
+      gl.uniform1i(uLocs.u_image_texture, 0);
+    }
+
+    generateIconDistanceTexture();
+
+    // ------------------------------------------------------------------------
+    // Animation Render Loop (Seamless 5.0s Cycle)
+    // ------------------------------------------------------------------------
+    const LOOP_PERIOD = 5.0; // 5.0 seconds seamless loop
+    let animStart = performance.now();
+    let overrideTime = null;
+
+    function renderFrame(now) {
+      const elapsed = (now - animStart) / 1000.0;
+      // Seamless progress: 0 to 1
+      const progress = (elapsed % LOOP_PERIOD) / LOOP_PERIOD;
+      const t = (overrideTime !== null ? overrideTime : progress * LOOP_PERIOD) * params.speed;
+
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+
+      gl.uniform1f(uLocs.u_time, t);
+      gl.uniform1f(uLocs.u_patternScale, params.repetition);
+      gl.uniform1f(uLocs.u_refraction, params.distortion);
+      gl.uniform1f(uLocs.u_edge, params.contour);
+      gl.uniform1f(uLocs.u_patternBlur, params.softness);
+      gl.uniform1f(uLocs.u_liquid, 0.07);
+      gl.uniform1f(uLocs.u_angle, (params.angle - 45.0) * (Math.PI / 180.0));
+      gl.uniform1f(uLocs.u_shiftRed, params.shiftRed);
+      gl.uniform1f(uLocs.u_shiftBlue, params.shiftBlue);
+
+      const tintRgb = hexToRgb(params.colorTint);
+      const backRgb = hexToRgb(params.colorBack);
+      gl.uniform3f(uLocs.u_colorTint, tintRgb[0], tintRgb[1], tintRgb[2]);
+      gl.uniform3f(uLocs.u_colorBack, backRgb[0], backRgb[1], backRgb[2]);
+
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+      // Mirror to header lockup preview canvas
+      miniCtx.clearRect(0, 0, miniCanvas.width, miniCanvas.height);
+      miniCtx.drawImage(canvas, 0, 0, miniCanvas.width, miniCanvas.height);
+
+      if (overrideTime === null) {
+        requestAnimationFrame(renderFrame);
+      }
+    }
+
+    requestAnimationFrame(renderFrame);
+
+    // ------------------------------------------------------------------------
+    // Seamless Loop Video Recording (WebM 60fps)
+    // ------------------------------------------------------------------------
+    let mediaRecorder = null;
+    let recordedChunks = [];
+
+    // Automated Headless Exporter Hooks
+    window.captureExactFrame = function(timeSec) {
+      overrideTime = timeSec;
+      renderFrame(performance.now());
+      return canvas.toDataURL('image/png');
+    };
+
+    window.startHeadlessRecording = function(durationSec = 5.0) {
+      window.recordingDone = false;
+      window.recordedVideoData = null;
+      const stream = canvas.captureStream(60);
+      const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+        ? 'video/webm;codecs=vp9'
+        : 'video/webm';
+
+      const rec = new MediaRecorder(stream, {
+        mimeType: mime,
+        videoBitsPerSecond: 20000000 // 20 Mbps
+      });
+
+      const chunks = [];
+      rec.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      rec.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          window.recordedVideoData = reader.result;
+          window.recordingDone = true;
+        };
+        reader.readAsDataURL(blob);
+      };
+
+      animStart = performance.now();
+      rec.start();
+      setTimeout(() => {
+        rec.stop();
+      }, durationSec * 1000);
+      return true;
+    };
+
+    function recordSeamlessLoop(format) {
+      const status = document.getElementById('statusMsg');
+      const btn = document.getElementById('recordWebmBtn');
+      btn.disabled = true;
+      status.innerText = 'Capturing 5.0s seamless loop at 60 fps...';
+
+      const stream = canvas.captureStream(60);
+      const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+        ? 'video/webm;codecs=vp9'
+        : 'video/webm';
+
+      recordedChunks = [];
+      mediaRecorder = new MediaRecorder(stream, {
+        mimeType: mime,
+        videoBitsPerSecond: 16000000 // 16 Mbps high fidelity
+      });
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) recordedChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `clinicscribe-liquid-metal-${currentPreset}-loop.webm`;
+        a.click();
+        status.innerText = 'Export complete! File downloaded: ' + a.download;
+        btn.disabled = false;
+      };
+
+      // Restart loop from frame 0 for precision
+      animStart = performance.now();
+      mediaRecorder.start();
+
+      setTimeout(() => {
+        mediaRecorder.stop();
+      }, LOOP_PERIOD * 1000);
+    }
+
+    function exportStaticFrame() {
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = `clinicscribe-liquid-metal-${currentPreset}-poster.png`;
+      a.click();
+      document.getElementById('statusMsg').innerText = 'Poster frame exported: ' + a.download;
+    }
+  </script>
+</body>
+</html>
