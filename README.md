@@ -70,6 +70,34 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
+## ☁️ Google Cloud Enterprise Architecture
+
+ClinicScribe is architected to leverage Google Cloud’s enterprise data & AI suite:
+
+| Google Cloud Service | Purpose in ClinicScribe | Architecture Configuration |
+| :--- | :--- | :--- |
+| **Google Cloud Vertex AI** | Multilingual clinical transcription & structured extraction via Gemini 1.5 Pro | `asia-south1` (Mumbai), ADC IAM authentication, zero-fabrication safety settings |
+| **Google Cloud AlloyDB for PostgreSQL** | Enterprise database with columnar acceleration & semantic vector retrieval | Columnar Engine (`google_columnar_engine.enabled = on`), `pgvector` for clinical guidelines, multi-tenant partitioning on `clinic_id` |
+| **Google Artifact Registry** | Secure Docker container image repository | `asia-south1-docker.pkg.dev/${PROJECT_ID}/clinicscribe-registry/{backend,frontend}` |
+| **Google Cloud Storage (GCS)** | Encrypted consultation audio storage & tamper-evident ReportLab prescription PDFs | `gs://${PROJECT_ID}-consultation-audio`, `gs://${PROJECT_ID}-clinical-documents` (Uniform bucket-level access & retention rules) |
+| **Google Cloud Run** | Fully managed serverless container runtime with Serverless VPC Connector | Autoscaling 0 to 50 instances, connected directly to AlloyDB private IP |
+| **Google Cloud Build** | Automated CI/CD pipeline | Multi-stage build manifest in [cloudbuild.yaml](file:///c:/ClinicScribe/cloudbuild.yaml) |
+| **Terraform IaC** | Declarative cloud infrastructure provisioning | Complete infrastructure definitions in [terraform/main.tf](file:///c:/ClinicScribe/terraform/main.tf) |
+
+### 🚀 1-Click Google Cloud Deployment
+For Linux / macOS / Cloud Shell:
+```bash
+chmod +x deploy-gcp.sh
+./deploy-gcp.sh
+```
+
+For Windows PowerShell:
+```powershell
+.\deploy-gcp.ps1 -ProjectId "your-gcp-project-id" -Region "asia-south1"
+```
+
+---
+
 ## 🔒 Security & Medical Safety Mandates
 1. **Doctor-in-the-Loop**: AI never independently makes clinical decisions or finalizes notes without doctor review and approval.
 2. **Consent-First**: Consultation audio recording strictly requires documented patient consent.

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -93,12 +93,12 @@ export default function ConsultationDetailPage() {
   );
 
   // Safety Callout / Guardrail flags
-  const [missingInfo] = useState<string[]>([
+  const [missingInfo, setMissingInfo] = useState<string[]>([
     "Previous antibiotic allergy history not discussed during consultation.",
   ]);
 
   // Raw Transcript Data
-  const rawTranscript = [
+  const [rawTranscript, setRawTranscript] = useState([
     {
       speaker: "Doctor",
       time: "00:03",
@@ -129,102 +129,112 @@ export default function ConsultationDetailPage() {
       time: "01:18",
       text: "Drink plenty of warm water, at least 2.5 liters a day. Avoid ice water and dust. Come back for review in 5 days if cough persists.",
     },
-  ];
+  ]);
 
-  // Multilingual Patient Summary Data
+  // Sync from recorded voice session if present
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("active_consultation");
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          if (data.chiefComplaint) setChiefComplaint(data.chiefComplaint);
+          if (data.hpi) setHpi(data.hpi);
+          if (Array.isArray(data.symptoms)) setSymptoms(data.symptoms);
+          if (data.examFindings) setExamFindings(data.examFindings);
+          if (data.diagnosis) setDiagnosis(data.diagnosis);
+          if (Array.isArray(data.medications)) setMedications(data.medications);
+          if (Array.isArray(data.advice)) setAdvice(data.advice);
+          if (data.followUp) setFollowUp(data.followUp);
+          if (Array.isArray(data.missingInfo)) setMissingInfo(data.missingInfo);
+          if (Array.isArray(data.transcript) && data.transcript.length > 0) {
+            setRawTranscript(data.transcript);
+          }
+        } catch (_) {}
+      }
+    }
+  }, []);
+
+  // Multilingual Patient Summary Data - Dynamically reflects medications & diagnosis
   const patientSummaries = {
     Tamil: {
       title: "மருத்துவர் ஆலோசனைக் குறிப்பு & வழிமுறைகள் (Patient Care Guide)",
-      greeting: "வணக்கம் Priya Sundaram, உங்கள் நலமே எங்களின் முதன்மை நோக்கம்.",
+      greeting: "வணக்கம், உங்கள் நலமே எங்களின் முதன்மை நோக்கம்.",
       diagnosisText:
-        "மருத்துவர் உங்கள் பரிசோதனையின் முடிவில் மூச்சுக்குழாய் அழற்சி (Acute Bronchitis) உள்ளதாக குறிப்பிட்டுள்ளார். முறையான மாத்திரைகள், வெதுவெதுப்பான சுடுதண்ணீர் மற்றும் போதிய ஓய்வு மூலம் இது 4-5 நாட்களில் முழுமையாக குணமாகும்.",
-      meds: [
-        {
-          name: "Paracetamol 650 mg",
-          schedule: "காலை - மதியம் - இரவு (உணவுக்குப் பின்)",
-          note: "காய்ச்சல் அல்லது தலைவலி இருக்கும் போது மட்டும் எடுத்துக்கொள்ளவும்.",
-        },
-        {
-          name: "Levocetirizine + Montelukast",
-          schedule: "இரவு தூங்கும் முன் (1 மாத்திரை)",
-          note: "லேசான தூக்கக் கலக்கம் வரலாம்; இரவில் மட்டுமே உட்கொள்ளவும்.",
-        },
-        {
-          name: "நீராவி பிடித்தல் (Steam Inhalation)",
-          schedule: "காலை மற்றும் இரவு (10 நிமிடங்கள்)",
-          note: "நெஞ்சு சளி குறைய வெதுவெதுப்பான நீரில் நீராவி பிடிக்கவும்.",
-        },
-      ],
-      dos: [
-        "தினமும் 2.5 லிட்டர் வெதுவெதுப்பான சுடுதண்ணீர் தவறாமல் குடிக்கவும்.",
-        "குளிர்ந்த பானங்கள், ஐஸ்கிரீம் மற்றும் தூசி நிறைந்த இடங்களை முழுமையாக தவிர்க்கவும்.",
-        "இருமல் குறையும் வரை தொண்டைக்கு ஓய்வு கொடுக்கவும்.",
-      ],
+        medications.length > 0
+          ? `மருத்துவர் உங்கள் பரிசோதனையின் முடிவில் ${diagnosis} உள்ளதாக குறிப்பிட்டுள்ளார். பரிந்துரைக்கப்பட்ட மாத்திரைகள் மற்றும் ஓய்வு மூலம் இது விரைவில் குணமாகும்.`
+          : `மருத்துவர் உங்கள் உடல்நிலையை பரிசோதித்து ${diagnosis} என்பதை உறுதிப்படுத்தியுள்ளார். இச்சந்திப்பில் பிரத்யேக மருந்துகள் எதுவும் தேவையில்லை; ஆரோக்கியமான வாழ்க்கைமுறை வழிமுறைகளை பின்பற்றவும்.`,
+      meds:
+        medications.length > 0
+          ? medications.map((m) => ({
+              name: `${m.name} (${m.dosage})`,
+              schedule: m.frequency,
+              note: m.instructions,
+            }))
+          : [],
+      dos:
+        advice.length > 0
+          ? advice
+          : [
+              "தினமும் 2.5 லிட்டர் வெதுவெதுப்பான சுடுதண்ணீர் தவறாமல் குடிக்கவும்.",
+              "சீரான உணவு மற்றும் உடற்பயிற்சியை தொடரவும்.",
+              "போதுமான ஓய்வு எடுக்கவும்.",
+            ],
       warning:
-        "மூச்சு விடுவதில் அதிக சிரமம், நெஞ்சு வலி, அல்லது 3 நாட்களுக்கு மேல் காய்ச்சல் தொடர்ந்தால் உடனடியாக மருத்துவமனைக்கு வரவும்.",
-      followUp: "5 நாட்களுக்குப் பிறகு மீண்டும் மருத்துவரை நேரில் சந்தித்து பரிசோதிக்கவும்.",
+        "உடல் நிலையில் ஏதேனும் புதிய அசௌகரியங்கள் அல்லது மூச்சுத் திணறல் ஏற்பட்டால் உடனடியாக மருத்துவமனைக்கு வரவும்.",
+      followUp: followUp || "தேவைப்படும்போது மருத்துவரை நேரில் அணுகவும்.",
     },
     Hindi: {
       title: "डॉक्टर परामर्श और देखभाल गाइड (Patient Care Guide)",
-      greeting: "नमस्ते Priya Sundaram जी, आपकी सेहत हमारी पहली प्राथमिकता है।",
+      greeting: "नमस्ते जी, आपकी सेहत हमारी पहली प्राथमिकता है।",
       diagnosisText:
-        "डॉक्टर ने जांच के बाद हल्की ब्रोंकाइटिस (Acute Bronchitis) पाई है। नियमित दवा, गुनगुने पानी और उचित आराम से यह 4-5 दिनों में पूरी तरह ठीक हो जाएगी।",
-      meds: [
-        {
-          name: "Paracetamol 650 mg",
-          schedule: "सुबह - दोपहर - रात (खाना खाने के बाद)",
-          note: "बुखार या बदन दर्द होने पर ही लें।",
-        },
-        {
-          name: "Levocetirizine + Montelukast",
-          schedule: "रात को सोने से पहले (1 गोली)",
-          note: "इससे हल्की नींद आ सकती है, केवल रात में लें।",
-        },
-        {
-          name: "भाप लेना (Steam Inhalation)",
-          schedule: "सुबह और शाम (10 मिनट)",
-          note: "छाती की जकड़न दूर करने के लिए गर्म पानी की भाप लें।",
-        },
-      ],
-      dos: [
-        "दिन भर में कम से कम 2.5 लीटर गुनगुना पानी पिएं।",
-        "ठंडे पेय पदार्थ, आइसक्रीम और धूल-मिट्टी से पूरी तरह परहेज करें।",
-        "गले को आराम दें और तेज आवाज में बात करने से बचें।",
-      ],
+        medications.length > 0
+          ? `डॉक्टर ने जांच के बाद ${diagnosis} पाई है। नियमित दवा और देखभाल से आप जल्द स्वस्थ हो जाएंगे।`
+          : `डॉक्टर ने आपके स्वास्थ्य की जांच में ${diagnosis} का अवलोकन किया है। इस परामर्श में किसी दवा की आवश्यकता नहीं है; स्वस्थ दिनचर्या का पालन करें।`,
+      meds:
+        medications.length > 0
+          ? medications.map((m) => ({
+              name: `${m.name} (${m.dosage})`,
+              schedule: m.frequency,
+              note: m.instructions,
+            }))
+          : [],
+      dos:
+        advice.length > 0
+          ? advice
+          : [
+              "दिन भर में पर्याप्त गुनगुना पानी पिएं।",
+              "संतुलित आहार लें और पर्याप्त आराम करें।",
+            ],
       warning:
-        "यदि सांस लेने में भारी तकलीफ, सीने में दर्द, या 3 दिन बाद भी तेज बुखार रहे तो तुरंत अस्पताल आएं।",
-      followUp: "5 दिनों के बाद क्लिनिक में फॉलो-अप जांच के लिए अवश्य पधारें।",
+        "यदि कोई नए लक्षण या बेचैनी महसूस हो, तो तुरंत डॉक्टर से संपर्क करें।",
+      followUp: followUp || "आवश्यकतानुसार फॉलो-अप के लिए क्लिनिक आएं।",
     },
     English: {
       title: "Doctor Consultation & Patient Care Guide",
-      greeting: "Hello Priya Sundaram, here is your personalized consultation care plan.",
+      greeting: "Hello, here is your personalized consultation care plan.",
       diagnosisText:
-        "The attending physician evaluated your symptoms and identified Acute Bronchitis. With regular medications, adequate hydration, and rest, full recovery is expected within 4 to 5 days.",
-      meds: [
-        {
-          name: "Paracetamol 650 mg",
-          schedule: "Morning - Afternoon - Night (After food)",
-          note: "Take SOS if temperature exceeds 100°F or body pain develops.",
-        },
-        {
-          name: "Levocetirizine + Montelukast",
-          schedule: "Bedtime Once Daily (After food)",
-          note: "May induce mild drowsiness; take exclusively before sleep.",
-        },
-        {
-          name: "Steam Inhalation with Saline",
-          schedule: "Twice Daily (Morning & Evening for 10 mins)",
-          note: "Inhale warm steam to loosen chest congestion.",
-        },
-      ],
-      dos: [
-        "Drink at least 2.5 Liters of warm fluids/water throughout the day.",
-        "Strictly avoid chilled beverages, cold desserts, and dusty environments.",
-        "Ensure adequate vocal and physical rest.",
-      ],
+        medications.length > 0
+          ? `The attending physician evaluated your symptoms and identified ${diagnosis}. With prescribed medications and rest, recovery is expected promptly.`
+          : `The attending physician conducted a review regarding ${diagnosis}. No pharmacological medications were prescribed during this encounter; conservative lifestyle measures are advised.`,
+      meds:
+        medications.length > 0
+          ? medications.map((m) => ({
+              name: `${m.name} (${m.dosage})`,
+              schedule: m.frequency,
+              note: m.instructions,
+            }))
+          : [],
+      dos:
+        advice.length > 0
+          ? advice
+          : [
+              "Maintain adequate fluid hydration (> 2.5 Liters/day).",
+              "Maintain balanced nutrition and adequate rest.",
+            ],
       warning:
-        "Seek immediate emergency hospital care if you experience severe breathlessness, chest pain, or persistent high fever beyond 3 days.",
-      followUp: "Return for follow-up review in 5 days or sooner if symptoms escalate.",
+        "Seek medical care immediately if any acute distress or unusual symptoms develop.",
+      followUp: followUp || "Review as needed or if symptoms escalate.",
     },
   };
 
@@ -592,32 +602,81 @@ export default function ConsultationDetailPage() {
                   <label className="text-xs font-bold uppercase text-deep-teal tracking-wide block">
                     Prescription Draft (Doctor-Reviewed)
                   </label>
-                  <span className="text-[11px] text-muted-slate">3 items</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-muted-slate font-medium">
+                      {medications.length} {medications.length === 1 ? "item" : "items"}
+                    </span>
+                    {isEditing && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setMedications([
+                            ...medications,
+                            {
+                              name: "New Medication",
+                              dosage: "500 mg",
+                              frequency: "Twice daily",
+                              duration: "5 days",
+                              instructions: "After food",
+                            },
+                          ])
+                        }
+                        className="text-[10px] text-deep-teal font-bold hover:underline"
+                      >
+                        + Add Medication
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="border border-ocean-teal/20 rounded-xl overflow-hidden text-xs">
-                  <table className="w-full text-left">
-                    <thead className="bg-pale-mist/60 text-dark-evergreen font-semibold">
-                      <tr>
-                        <th className="p-2.5">Medication & Strength</th>
-                        <th className="p-2.5">Frequency</th>
-                        <th className="p-2.5">Duration</th>
-                        <th className="p-2.5">Special Instructions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-ocean-teal/10 bg-white/60 text-muted-slate">
-                      {medications.map((m, idx) => (
-                        <tr key={idx} className="hover:bg-pale-mist/20">
-                          <td className="p-2.5 font-medium text-dark-evergreen">
-                            {m.name} <span className="text-[11px] font-normal text-muted-slate">({m.dosage})</span>
-                          </td>
-                          <td className="p-2.5">{m.frequency}</td>
-                          <td className="p-2.5">{m.duration}</td>
-                          <td className="p-2.5 text-[11px] italic">{m.instructions}</td>
+
+                {medications.length > 0 ? (
+                  <div className="border border-ocean-teal/20 rounded-xl overflow-hidden text-xs">
+                    <table className="w-full text-left">
+                      <thead className="bg-pale-mist/60 text-dark-evergreen font-semibold">
+                        <tr>
+                          <th className="p-2.5">Medication & Strength</th>
+                          <th className="p-2.5">Frequency</th>
+                          <th className="p-2.5">Duration</th>
+                          <th className="p-2.5">Special Instructions</th>
+                          {isEditing && <th className="p-2.5 w-10">Remove</th>}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody className="divide-y divide-ocean-teal/10 bg-white/60 text-muted-slate">
+                        {medications.map((m, idx) => (
+                          <tr key={idx} className="hover:bg-pale-mist/20">
+                            <td className="p-2.5 font-medium text-dark-evergreen">
+                              {m.name} <span className="text-[11px] font-normal text-muted-slate">({m.dosage})</span>
+                            </td>
+                            <td className="p-2.5">{m.frequency}</td>
+                            <td className="p-2.5">{m.duration}</td>
+                            <td className="p-2.5 text-[11px] italic">{m.instructions}</td>
+                            {isEditing && (
+                              <td className="p-2.5">
+                                <button
+                                  type="button"
+                                  onClick={() => setMedications(medications.filter((_, i) => i !== idx))}
+                                  className="text-rose-600 hover:text-rose-800 text-xs font-bold"
+                                >
+                                  ×
+                                </button>
+                              </td>
+                            )}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-xl bg-pale-mist/40 border border-ocean-teal/20 text-center space-y-1.5">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mint-green/15 text-dark-evergreen text-xs font-bold">
+                      <Check className="w-3.5 h-3.5 text-mint-green" />
+                      Zero-Fabrication Safety: No Medications Spoken
+                    </div>
+                    <p className="text-xs text-muted-slate max-w-md mx-auto leading-relaxed">
+                      Plain voice recording detected. No pharmacological medications were prescribed during this consultation.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Advice & Follow-Up */}
@@ -696,26 +755,36 @@ export default function ConsultationDetailPage() {
                   {currentLabels.schedule}
                 </h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {currentSummary.meds.map((med, idx) => (
-                  <div
-                    key={idx}
-                    className="p-4 rounded-2xl bg-white/70 border border-ocean-teal/20 flex flex-col justify-between"
-                  >
-                    <div>
-                      <span className="font-bold text-xs text-dark-evergreen block">
-                        {med.name}
-                      </span>
-                      <span className="inline-block px-2 py-0.5 rounded-full bg-pale-mist text-[11px] font-semibold text-deep-teal mt-1">
-                        {med.schedule}
-                      </span>
+              {currentSummary.meds.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {currentSummary.meds.map((med, idx) => (
+                    <div
+                      key={idx}
+                      className="p-4 rounded-2xl bg-white/70 border border-ocean-teal/20 flex flex-col justify-between"
+                    >
+                      <div>
+                        <span className="font-bold text-xs text-dark-evergreen block">
+                          {med.name}
+                        </span>
+                        <span className="inline-block px-2 py-0.5 rounded-full bg-pale-mist text-[11px] font-semibold text-deep-teal mt-1">
+                          {med.schedule}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-muted-slate mt-3 italic border-t border-ocean-teal/10 pt-2">
+                        {med.note}
+                      </p>
                     </div>
-                    <p className="text-[11px] text-muted-slate mt-3 italic border-t border-ocean-teal/10 pt-2">
-                      {med.note}
-                    </p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 rounded-2xl bg-pale-mist/40 border border-ocean-teal/20 text-center text-xs text-muted-slate italic">
+                  {selectedLanguage === "Tamil"
+                    ? "இச்சந்திப்பில் பிரத்யேக மருந்து மாத்திரைகள் ஏதும் பரிந்துரைக்கப்படவில்லை."
+                    : selectedLanguage === "Hindi"
+                    ? "इस परामर्श के दौरान कोई दवाएं नहीं लिखी गई हैं।"
+                    : "No pharmacological medications prescribed during this consultation encounter."}
+                </div>
+              )}
             </div>
 
             {/* Lifestyle & Care Rules */}

@@ -1,119 +1,105 @@
-﻿# =============================================================================
-# ClinicScribe — Automated Google Cloud Production Deployment Script (PowerShell)
-# Target Project: clinicscribe-515308
-# Target Region:  asia-south1 (Mumbai)
-# =============================================================================
+# ==============================================================================
+# ClinicScribe - Google Cloud Enterprise Deployment Script (PowerShell)
+# Provisions:
+#   - Google Cloud Vertex AI (Gemini 1.5 Pro)
+#   - Google Cloud AlloyDB for PostgreSQL
+#   - Google Artifact Registry (Docker Container Repository)
+#   - Google Cloud Storage (Encrypted Audio & Prescription PDFs)
+#   - Serverless VPC Access Connector
+#   - Google Cloud Run (Autoscaling Backend & Frontend)
+# ==============================================================================
+
+param (
+    [string]$ProjectId = $env:GCP_PROJECT_ID,
+    [string]$Region = "asia-south1",
+    [string]$ArtifactRepo = "clinicscribe-registry",
+    [string]$AlloyDBCluster = "clinicscribe-alloydb-cluster",
+    [string]$AlloyDBInstance = "clinicscribe-primary-instance"
+)
 
 $ErrorActionPreference = "Stop"
 
-$PROJECT_ID = "clinicscribe-515308"
-$REGION = "asia-south1"
-$REPO_NAME = "clinicscribe-repo"
+if (-not $ProjectId) {
+    try {
+        $ProjectId = (gcloud config get-value project 2>$null).Trim()
+    } catch {}
+}
 
-Write-Host "==================================================================" -ForegroundColor Cyan
-Write-Host "🏥 ClinicScribe — Google Cloud Production Deployment" -ForegroundColor Green
-Write-Host "Project ID: $PROJECT_ID"
-Write-Host "Region:     $REGION"
-Write-Host "==================================================================" -ForegroundColor Cyan
+if (-not $ProjectId) {
+    Write-Error "GCP Project ID is required. Pass -ProjectId <ID> or set GCP_PROJECT_ID."
+    exit 1
+}
 
-# 1. Set Google Cloud Project
-Write-Host "1️⃣  Configuring active GCP project..." -ForegroundColor Yellow
-gcloud config set project $PROJECT_ID
+Write-Host "=================================================================" -ForegroundColor Cyan
+Write-Host " ClinicScribe: Google Cloud Enterprise Deployment (Windows/PowerShell)" -ForegroundColor Cyan
+Write-Host " Project:  $ProjectId" -ForegroundColor Green
+Write-Host " Region:   $Region" -ForegroundColor Green
+Write-Host "=================================================================" -ForegroundColor Cyan
 
-# 2. Enable Required GCP APIs
-Write-Host "2️⃣  Enabling required Google Cloud APIs..." -ForegroundColor Yellow
+# 1. Enable Services
+Write-Host "[1/7] Enabling Google Cloud Services (Vertex AI, AlloyDB, Artifact Registry, Cloud Run)..." -ForegroundColor Yellow
 gcloud services enable `
-    run.googleapis.com `
+    aiplatform.googleapis.com `
+    alloydb.googleapis.com `
     artifactregistry.googleapis.com `
-    cloudbuild.googleapis.com `
+    run.googleapis.com `
+    vpcaccess.googleapis.com `
     secretmanager.googleapis.com `
+    compute.googleapis.com `
+    servicenetworking.googleapis.com `
     storage.googleapis.com `
-    generativelanguage.googleapis.com
+    cloudbuild.googleapis.com `
+    --project=$ProjectId
 
-# 3. Create Artifact Registry Repository
-Write-Host "3️⃣  Checking / Creating Artifact Registry repository..." -ForegroundColor Yellow
-$repoExists = gcloud artifacts repositories describe $REPO_NAME --location=$REGION 2>&1
-if ($LASTEXITCODE -ne 0) {
-    gcloud artifacts repositories create $REPO_NAME `
+# 2. Artifact Registry
+Write-Host "[2/7] Ensuring Google Artifact Registry repository exists..." -ForegroundColor Yellow
+$repoCheck = gcloud artifacts repositories describe $ArtifactRepo --location=$Region --project=$ProjectId 2>$null
+if (-not $repoCheck) {
+    gcloud artifacts repositories create $ArtifactRepo `
         --repository-format=docker `
-        --location=$REGION `
-        --description="ClinicScribe Docker container repository"
-    Write-Host "   ✅ Created Artifact Registry: $REPO_NAME in $REGION" -ForegroundColor Green
+        --location=$Region `
+        --description="ClinicScribe Healthcare SaaS Docker Container Registry" `
+        --project=$ProjectId
+    Write-Host "Artifact Registry created: $Region-docker.pkg.dev/$ProjectId/$ArtifactRepo" -ForegroundColor Green
 } else {
-    Write-Host "   ✅ Artifact Registry $REPO_NAME already exists." -ForegroundColor Green
+    Write-Host "Artifact Registry repository already exists." -ForegroundColor Gray
 }
 
-# 4. Storage Buckets
-$AUDIO_BUCKET = "$PROJECT_ID-audio"
-$DOCS_BUCKET = "$PROJECT_ID-docs"
-Write-Host "4️⃣  Configuring Cloud Storage buckets..." -ForegroundColor Yellow
+# 3. Cloud Storage
+Write-Host "[3/7] Setting up Cloud Storage buckets..." -ForegroundColor Yellow
+$audioBucket = "gs://${ProjectId}-consultation-audio"
+$docsBucket = "gs://${ProjectId}-clinical-documents"
+gsutil mb -p $ProjectId -c STANDARD -l $Region $audioBucket 2>$null
+gsutil mb -p $ProjectId -c STANDARD -l $Region $docsBucket 2>$null
 
-$bucketAudioExists = gcloud storage buckets describe "gs://$AUDIO_BUCKET" 2>&1
-if ($LASTEXITCODE -ne 0) {
-    gcloud storage buckets create "gs://$AUDIO_BUCKET" --location=$REGION --uniform-bucket-level-access
-    Write-Host "   ✅ Audio bucket created: gs://$AUDIO_BUCKET" -ForegroundColor Green
+# 4. AlloyDB Cluster & Instance
+Write-Host "[4/7] Ensuring Google Cloud AlloyDB for PostgreSQL Cluster & Instance..." -ForegroundColor Yellow
+$clusterCheck = gcloud alloydb clusters describe $AlloyDBCluster --region=$Region --project=$ProjectId 2>$null
+if (-not $clusterCheck) {
+    Write-Host "Creating AlloyDB Cluster: $AlloyDBCluster..." -ForegroundColor Yellow
+    gcloud alloydb clusters create $AlloyDBCluster `
+        --region=$Region `
+        --network=default `
+        --password="ChangeMeImmediatelyClinicScribe2026!" `
+        --project=$ProjectId
 }
 
-$bucketDocsExists = gcloud storage buckets describe "gs://$DOCS_BUCKET" 2>&1
-if ($LASTEXITCODE -ne 0) {
-    gcloud storage buckets create "gs://$DOCS_BUCKET" --location=$REGION --uniform-bucket-level-access
-    Write-Host "   ✅ Docs bucket created: gs://$DOCS_BUCKET" -ForegroundColor Green
+$instCheck = gcloud alloydb instances describe $AlloyDBInstance --cluster=$AlloyDBCluster --region=$Region --project=$ProjectId 2>$null
+if (-not $instCheck) {
+    Write-Host "Creating AlloyDB Primary Instance: $AlloyDBInstance..." -ForegroundColor Yellow
+    gcloud alloydb instances create $AlloyDBInstance `
+        --cluster=$AlloyDBCluster `
+        --region=$Region `
+        --instance-type=PRIMARY `
+        --cpu-count=2 `
+        --project=$ProjectId
 }
 
-# 5. Build & Deploy Backend
-Write-Host "5️⃣  Building and deploying ClinicScribe FastAPI Backend to Cloud Run..." -ForegroundColor Yellow
-$BACKEND_IMAGE = "$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/backend:latest"
+# 5. Cloud Build Submission
+Write-Host "[5/7] Submitting container build and deployment via Cloud Build..." -ForegroundColor Yellow
+gcloud builds submit --config=cloudbuild.yaml --project=$ProjectId
 
-gcloud builds submit backend --tag=$BACKEND_IMAGE
+Write-Host "=================================================================" -ForegroundColor Green
+Write-Host " ClinicScribe Google Cloud Enterprise Deployment Successfully Initiated!" -ForegroundColor Green
+Write-Host "=================================================================" -ForegroundColor Green
 
-gcloud run deploy clinicscribe-backend `
-    --image=$BACKEND_IMAGE `
-    --region=$REGION `
-    --platform=managed `
-    --allow-unauthenticated `
-    --cpu=1 `
-    --memory=1Gi `
-    --min-instances=0 `
-    --max-instances=10 `
-    --port=8000 `
-    --set-env-vars="ENVIRONMENT=production,DEBUG=False,PROJECT_NAME=ClinicScribe,AUDIO_STORAGE_BUCKET=$AUDIO_BUCKET,DOCS_STORAGE_BUCKET=$DOCS_BUCKET"
-
-$BACKEND_URL = (gcloud run services describe clinicscribe-backend --region=$REGION --format="value(status.url)").Trim()
-Write-Host "   ✅ Backend deployed: $BACKEND_URL" -ForegroundColor Green
-
-# 6. Build & Deploy Frontend
-Write-Host "6️⃣  Building and deploying ClinicScribe Next.js Frontend to Cloud Run..." -ForegroundColor Yellow
-$FRONTEND_IMAGE = "$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/frontend:latest"
-
-gcloud builds submit frontend --tag=$FRONTEND_IMAGE
-
-gcloud run deploy clinicscribe-frontend `
-    --image=$FRONTEND_IMAGE `
-    --region=$REGION `
-    --platform=managed `
-    --allow-unauthenticated `
-    --cpu=1 `
-    --memory=512Mi `
-    --min-instances=0 `
-    --max-instances=10 `
-    --port=3000 `
-    --set-env-vars="NEXT_PUBLIC_API_URL=$BACKEND_URL/api/v1"
-
-$FRONTEND_URL = (gcloud run services describe clinicscribe-frontend --region=$REGION --format="value(status.url)").Trim()
-
-# 7. Update Backend CORS
-Write-Host "7️⃣  Updating Backend CORS whitelist..." -ForegroundColor Yellow
-gcloud run services update clinicscribe-backend `
-    --region=$REGION `
-    --update-env-vars="CORS_ORIGINS=[`"$FRONTEND_URL`",`"http://localhost:3000`",`"http://localhost:3001`"]"
-
-Write-Host ""
-Write-Host "==================================================================" -ForegroundColor Cyan
-Write-Host "🎉 DEPLOYMENT COMPLETE!" -ForegroundColor Green
-Write-Host "==================================================================" -ForegroundColor Cyan
-Write-Host "🌐 Frontend Web App:     $FRONTEND_URL" -ForegroundColor Cyan
-Write-Host "🏥 Doctor Dashboard:     $FRONTEND_URL/dashboard" -ForegroundColor Cyan
-Write-Host "🎨 Liquid Metal Brand:   $FRONTEND_URL/liquid-metal" -ForegroundColor Cyan
-Write-Host "📚 Backend REST API:     $BACKEND_URL/api/v1/docs" -ForegroundColor Cyan
-Write-Host "🩺 Backend Health:       $BACKEND_URL/api/v1/healthz" -ForegroundColor Cyan
-Write-Host "==================================================================" -ForegroundColor Cyan

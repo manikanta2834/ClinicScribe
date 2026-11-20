@@ -21,6 +21,14 @@ const config: Config = {
           mint: "#0B927F",          // Mint Green
           slate: "#607D7B",         // Muted Slate
         },
+        // Flat aliases matching medical design tokens
+        "dark-evergreen": "#075D55",
+        "deep-teal": "#267C78",
+        "ocean-teal": "#48B7A0",
+        "mint-green": "#0B927F",
+        "seafoam-aqua": "#BFE1E0",
+        "pale-mist": "#E2F0F1",
+        "muted-slate": "#607D7B",
       },
       borderRadius: {
         "xl": "16px",

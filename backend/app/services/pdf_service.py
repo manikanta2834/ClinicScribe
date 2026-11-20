@@ -230,44 +230,61 @@ class PDFReportService:
         elements.append(Paragraph("<b>℞ PRESCRIPTION:</b>", rx_symbol))
         elements.append(Spacer(1, 4))
 
-        rx_headers = [
-            Paragraph("<b>#</b>", body_style),
-            Paragraph("<b>Medicine & Strength</b>", body_style),
-            Paragraph("<b>Frequency</b>", body_style),
-            Paragraph("<b>Duration</b>", body_style),
-            Paragraph("<b>Instructions</b>", body_style),
-        ]
-        rx_rows = [rx_headers]
+        if medications and len(medications) > 0:
+            rx_headers = [
+                Paragraph("<b>#</b>", body_style),
+                Paragraph("<b>Medicine & Strength</b>", body_style),
+                Paragraph("<b>Frequency</b>", body_style),
+                Paragraph("<b>Duration</b>", body_style),
+                Paragraph("<b>Instructions</b>", body_style),
+            ]
+            rx_rows = [rx_headers]
 
-        for idx, m in enumerate(medications, start=1):
-            med_name = clean_xml(m.get('medicine_name', ''))
-            dosage = clean_xml(m.get('dosage', ''))
-            freq = clean_xml(m.get('frequency', ''))
-            dur = clean_xml(m.get('duration', ''))
-            inst = clean_xml(m.get('special_instructions', ''))
-            rx_rows.append([
-                Paragraph(f"{idx}", body_style),
-                Paragraph(f"<b>{med_name}</b> ({dosage})", body_style),
-                Paragraph(f"{freq}", body_style),
-                Paragraph(f"{dur}", body_style),
-                Paragraph(f"{inst}", body_style),
-            ])
+            for idx, m in enumerate(medications, start=1):
+                med_name = clean_xml(m.get('medicine_name', ''))
+                dosage = clean_xml(m.get('dosage', ''))
+                freq = clean_xml(m.get('frequency', ''))
+                dur = clean_xml(m.get('duration', ''))
+                inst = clean_xml(m.get('special_instructions', ''))
+                rx_rows.append([
+                    Paragraph(f"{idx}", body_style),
+                    Paragraph(f"<b>{med_name}</b> ({dosage})", body_style),
+                    Paragraph(f"{freq}", body_style),
+                    Paragraph(f"{dur}", body_style),
+                    Paragraph(f"{inst}", body_style),
+                ])
 
-        rx_table = Table(rx_rows, colWidths=[0.35 * inch, 2.55 * inch, 1.4 * inch, 1.1 * inch, 2.2 * inch])
-        rx_table.setStyle(
-            TableStyle([
-                ("BACKGROUND", (0, 0), (-1, 0), DEEP_TEAL),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-                ("ALIGN", (0, 0), (0, -1), "CENTER"),
-                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#BFE1E0")),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, SOFT_WHITE]),
-                ("TOPPADDING", (0, 0), (-1, -1), 5),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
-                ("LEFTPADDING", (0, 0), (-1, -1), 6),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 6),
-            ])
-        )
-        elements.append(rx_table)
+            rx_table = Table(rx_rows, colWidths=[0.35 * inch, 2.55 * inch, 1.4 * inch, 1.1 * inch, 2.2 * inch])
+            rx_table.setStyle(
+                TableStyle([
+                    ("BACKGROUND", (0, 0), (-1, 0), DEEP_TEAL),
+                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                    ("ALIGN", (0, 0), (0, -1), "CENTER"),
+                    ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#BFE1E0")),
+                    ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, SOFT_WHITE]),
+                    ("TOPPADDING", (0, 0), (-1, -1), 5),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 6),
+                    ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+                ])
+            )
+            elements.append(rx_table)
+        else:
+            no_rx_table = Table(
+                [[Paragraph("<i>No pharmacological medications prescribed during this consultation encounter. General observation & lifestyle recommendations apply.</i>", body_style)]],
+                colWidths=[7.6 * inch]
+            )
+            no_rx_table.setStyle(
+                TableStyle([
+                    ("BACKGROUND", (0, 0), (-1, -1), SOFT_WHITE),
+                    ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#BFE1E0")),
+                    ("TOPPADDING", (0, 0), (-1, -1), 6),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 8),
+                ])
+            )
+            elements.append(no_rx_table)
+
         elements.append(Spacer(1, 10))
 
         # 5. Advice and Follow-up

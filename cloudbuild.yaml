@@ -1,96 +1,96 @@
+# ClinicScribe - Google Cloud Build Pipeline
+# Builds, tests, pushes to Google Artifact Registry, and deploys to Cloud Run with Vertex AI and AlloyDB
+
 steps:
-  # =========================================================================
-  # 1. Build Backend Container Image
-  # =========================================================================
+  # 1. Backend Unit Tests
+  - name: 'python:3.11-slim'
+    id: 'backend-tests'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        cd backend
+        pip install --no-cache-dir -r requirements.txt
+        pytest
+
+  # 2. Build Backend Docker Container (Tagged for Artifact Registry)
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-backend-image'
     args:
       - 'build'
       - '-t'
-      - 'asia-south1-docker.pkg.dev/$PROJECT_ID/clinicscribe-repo/backend:$COMMIT_SHA'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/backend:${COMMIT_SHA}'
       - '-t'
-      - 'asia-south1-docker.pkg.dev/$PROJECT_ID/clinicscribe-repo/backend:latest'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/backend:latest'
       - './backend'
-    id: 'build-backend'
 
-  # =========================================================================
-  # 2. Push Backend Image to Artifact Registry
-  # =========================================================================
+  # 3. Push Backend Container to Google Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-backend-image'
     args:
       - 'push'
       - '--all-tags'
-      - 'asia-south1-docker.pkg.dev/$PROJECT_ID/clinicscribe-repo/backend'
-    id: 'push-backend'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/backend'
 
-  # =========================================================================
-  # 3. Deploy Backend to Cloud Run
-  # =========================================================================
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args:
-      - 'run'
-      - 'deploy'
-      - 'clinicscribe-backend'
-      - '--image=asia-south1-docker.pkg.dev/$PROJECT_ID/clinicscribe-repo/backend:$COMMIT_SHA'
-      - '--region=asia-south1'
-      - '--platform=managed'
-      - '--allow-unauthenticated'
-      - '--cpu=1'
-      - '--memory=1Gi'
-      - '--min-instances=0'
-      - '--max-instances=10'
-      - '--port=8000'
-      - '--set-env-vars=ENVIRONMENT=production,DEBUG=False'
-    id: 'deploy-backend'
-
-  # =========================================================================
-  # 4. Build Frontend Container Image
-  # =========================================================================
+  # 4. Build Frontend Docker Container (Tagged for Artifact Registry)
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-frontend-image'
     args:
       - 'build'
       - '-t'
-      - 'asia-south1-docker.pkg.dev/$PROJECT_ID/clinicscribe-repo/frontend:$COMMIT_SHA'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/frontend:${COMMIT_SHA}'
       - '-t'
-      - 'asia-south1-docker.pkg.dev/$PROJECT_ID/clinicscribe-repo/frontend:latest'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/frontend:latest'
       - './frontend'
-    id: 'build-frontend'
 
-  # =========================================================================
-  # 5. Push Frontend Image to Artifact Registry
-  # =========================================================================
+  # 5. Push Frontend Container to Google Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-frontend-image'
     args:
       - 'push'
       - '--all-tags'
-      - 'asia-south1-docker.pkg.dev/$PROJECT_ID/clinicscribe-repo/frontend'
-    id: 'push-frontend'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/frontend'
 
-  # =========================================================================
-  # 6. Deploy Frontend to Cloud Run
-  # =========================================================================
+  # 6. Deploy Backend API to Cloud Run (With Vertex AI & AlloyDB configuration)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
+    id: 'deploy-backend-cloudrun'
+    entrypoint: 'gcloud'
     args:
       - 'run'
       - 'deploy'
-      - 'clinicscribe-frontend'
-      - '--image=asia-south1-docker.pkg.dev/$PROJECT_ID/clinicscribe-repo/frontend:$COMMIT_SHA'
-      - '--region=asia-south1'
+      - 'clinicscribe-api'
+      - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/backend:${COMMIT_SHA}'
+      - '--region=${_REGION}'
       - '--platform=managed'
       - '--allow-unauthenticated'
-      - '--cpu=1'
-      - '--memory=512Mi'
-      - '--min-instances=0'
-      - '--max-instances=10'
-      - '--port=3000'
-    id: 'deploy-frontend'
+      - '--set-env-vars=ENVIRONMENT=production,DEBUG=false,USE_VERTEX_AI=true,GCP_PROJECT_ID=${PROJECT_ID},GCP_REGION=${_REGION},VERTEX_AI_LOCATION=${_REGION},ALLOYDB_ENABLED=true,ALLOYDB_PROJECT_ID=${PROJECT_ID},ALLOYDB_REGION=${_REGION},ALLOYDB_CLUSTER=clinicscribe-alloydb-cluster,ALLOYDB_INSTANCE=clinicscribe-primary-instance'
+      - '--vpc-connector=projects/${PROJECT_ID}/locations/${_REGION}/connectors/clinicscribe-vpc-cx'
+      - '--service-account=clinicscribe-app-sa@${PROJECT_ID}.iam.gserviceaccount.com'
+
+  # 7. Deploy Frontend Web App to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-frontend-cloudrun'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'clinicscribe-web'
+      - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/frontend:${COMMIT_SHA}'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars=NODE_ENV=production,NEXT_PUBLIC_APP_ENV=production'
+
+substitutions:
+  _REGION: 'asia-south1'
+  _REPO_NAME: 'clinicscribe-registry'
 
 images:
-  - 'asia-south1-docker.pkg.dev/$PROJECT_ID/clinicscribe-repo/backend:$COMMIT_SHA'
-  - 'asia-south1-docker.pkg.dev/$PROJECT_ID/clinicscribe-repo/backend:latest'
-  - 'asia-south1-docker.pkg.dev/$PROJECT_ID/clinicscribe-repo/frontend:$COMMIT_SHA'
-  - 'asia-south1-docker.pkg.dev/$PROJECT_ID/clinicscribe-repo/frontend:latest'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/backend:${COMMIT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/backend:latest'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/frontend:${COMMIT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/frontend:latest'
 
 options:
   logging: CLOUD_LOGGING_ONLY
+

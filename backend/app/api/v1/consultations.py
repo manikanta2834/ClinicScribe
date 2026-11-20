@@ -115,10 +115,10 @@ async def process_consultation_audio(
     if not consultation.has_patient_consent or not consultation.consent_record:
         raise PatientConsentRequiredException("Cannot process recording without verified patient consent.")
 
-    transcript = data.transcript_text or (
-        "Doctor: Vanakkam Ramesh, enna problem ungalluku?\n"
-        "Patient: Doctor, 3 days-ah severe chest congestion and dry cough irukku. Night time fever kooda irundhudhu.\n"
-        "Doctor: Okay, let me examine your chest. Blood pressure is 128/82. Lungs are clear. I will prescribe Paracetamol and an inhaler."
+    transcript = data.transcript_text if (data.transcript_text is not None and data.transcript_text.strip() != "") else (
+        "Doctor: Hello, how can I help you today?\n"
+        "Patient: I am here for a routine general consultation.\n"
+        "Doctor: General physical observation is normal. No acute symptoms. Stay hydrated and active. No medications needed today."
     )
 
     # 2. Invoke Gemini AI Structured Clinical Extraction
@@ -341,9 +341,11 @@ async def update_consultation_note(
 
 
 @router.post("/{consultation_id}/summary", response_model=PatientSummaryResponse, status_code=status.HTTP_200_OK)
+@router.get("/{consultation_id}/patient-summary", response_model=PatientSummaryResponse, status_code=status.HTTP_200_OK)
 async def get_patient_summary(
     consultation_id: str,
-    request: PatientSummaryRequest,
+    language: Optional[str] = Query(None, description="Summary language query parameter"),
+    request: Optional[PatientSummaryRequest] = None,
     clinic: Clinic = Depends(get_current_clinic),
     db: AsyncSession = Depends(get_db),
 ) -> PatientSummaryResponse:
@@ -352,6 +354,18 @@ async def get_patient_summary(
 
     if not consultation or not consultation.clinical_note:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Consultation note not found.")
+
+    target_lang = "Tamil"
+    if request and request.language:
+        target_lang = request.language
+    elif language:
+        lang_lower = language.lower()
+        if "ta" in lang_lower:
+            target_lang = "Tamil"
+        elif "hi" in lang_lower:
+            target_lang = "Hindi"
+        else:
+            target_lang = "English"
 
     note = consultation.clinical_note
     pt_name = f"{consultation.patient.first_name} {consultation.patient.last_name}" if consultation.patient else "Patient"
@@ -362,12 +376,13 @@ async def get_patient_summary(
         medications=note.medication_instructions,
         advice=note.advice,
         follow_up=note.follow_up_instructions,
-        language=request.language,
+        language=target_lang,
     )
     return summary
 
 
 @router.get("/{consultation_id}/prescription-pdf", status_code=status.HTTP_200_OK)
+@router.get("/{consultation_id}/pdf", status_code=status.HTTP_200_OK)
 async def download_prescription_pdf(
     consultation_id: str,
     clinic: Clinic = Depends(get_current_clinic),

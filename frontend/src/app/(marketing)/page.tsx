@@ -12,6 +12,7 @@ import {
 import { GlassButton } from "@/components/ui/glass-button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { PillBadge } from "@/components/ui/pill-badge";
+import { AnalyticsRectificationShowcase } from "@/components/marketing/analytics-rectification-showcase";
 
 export default function MarketingPage() {
   return (
@@ -176,7 +177,10 @@ export default function MarketingPage() {
         </div>
       </section>
 
-      {/* 4. Core Features */}
+      {/* 4. Clinical Intelligence & Analytics Rectification Showcase */}
+      <AnalyticsRectificationShowcase />
+
+      {/* 5. Core Features */}
       <section id="features" className="max-w-6xl mx-auto px-6 space-y-12">
         <div className="text-center space-y-3">
           <h2 className="text-3xl font-extrabold text-brand-evergreen">
