@@ -16,7 +16,7 @@ echo "================================================================="
 
 gcloud config set project "${PROJECT_ID}"
 
-echo "[1/3] Enabling Google Cloud Services (Cloud Run, Cloud Build, Vertex AI, Artifact Registry)..."
+echo "[1/4] Enabling Google Cloud Services (Cloud Run, Cloud Build, Vertex AI, Artifact Registry)..."
 gcloud services enable \
   run.googleapis.com \
   cloudbuild.googleapis.com \
@@ -25,7 +25,20 @@ gcloud services enable \
   storage.googleapis.com \
   --project="${PROJECT_ID}"
 
-echo "[2/3] Building and Deploying Backend API to Cloud Run..."
+echo "[2/4] Granting Service Account Storage & Build permissions..."
+PROJECT_NUMBER=$(gcloud projects describe "${PROJECT_ID}" --format='value(projectNumber)')
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+  --role="roles/storage.admin" \
+  --condition=None || true
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+  --role="roles/artifactregistry.writer" \
+  --condition=None || true
+
+echo "[3/4] Building and Deploying Backend API to Cloud Run..."
 gcloud run deploy clinicscribe-api \
   --source=./backend \
   --region="${REGION}" \
@@ -38,7 +51,7 @@ gcloud run deploy clinicscribe-api \
 BACKEND_URL=$(gcloud run services describe clinicscribe-api --region="${REGION}" --project="${PROJECT_ID}" --format='value(status.url)')
 echo "Backend API is live at: ${BACKEND_URL}"
 
-echo "[3/3] Building and Deploying Frontend Web App to Cloud Run..."
+echo "[4/4] Building and Deploying Frontend Web App to Cloud Run..."
 gcloud run deploy clinicscribe-web \
   --source=./frontend \
   --region="${REGION}" \
@@ -56,3 +69,4 @@ echo " 🌐 Frontend Web App: ${FRONTEND_URL}"
 echo " 🩺 Backend API:      ${BACKEND_URL}"
 echo " 📖 API Docs:         ${BACKEND_URL}/api/v1/docs"
 echo "================================================================="
+
