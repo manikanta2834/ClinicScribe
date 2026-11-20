@@ -53,21 +53,15 @@
         0% { stroke-dashoffset: 1200; }
         100% { stroke-dashoffset: 0; }
       }
-      @keyframes floatOrb {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-12px) rotate(8deg); }
-      }
       @keyframes tagPulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.03); }
+        0%, 100% { opacity: 0.9; }
+        50% { opacity: 1; }
       }
       .pulse-bg { animation: pulseGlow 6s infinite ease-in-out; transform-origin: center; }
       .ecg-line {
         stroke-dasharray: 1200;
         animation: ecgMove 4s linear infinite;
       }
-      .floating { animation: floatOrb 5s ease-in-out infinite; }
-      .badge-glow { animation: tagPulse 3s ease-in-out infinite; }
     </style>
   </defs>
 
@@ -106,7 +100,8 @@
   </text>
 
   <!-- Animated Stethoscope / AI Scribe Icon (Right Side) -->
-  <g class="floating" transform="translate(890, 75)">
+  <g transform="translate(890, 75)">
+    <animateTransform attributeName="transform" type="translate" values="890,75; 890,65; 890,75" dur="4s" repeatCount="indefinite" />
     <circle cx="100" cy="100" r="85" fill="#075D55" fill-opacity="0.6" stroke="#48B7A0" stroke-width="2" filter="url(#glow)" />
     <!-- Medical AI Spark Cross -->
     <path d="M 100 45 L 100 155 M 45 100 L 155 100" stroke="#BFE1E0" stroke-width="14" stroke-linecap="round" />
@@ -157,3 +152,4 @@
     </text>
   </g>
 </svg>
+
