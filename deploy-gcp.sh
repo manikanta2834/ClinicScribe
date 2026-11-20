@@ -13,7 +13,7 @@
 set -euo pipefail
 
 # Configuration Defaults (Override via environment or parameters)
-PROJECT_ID="${GCP_PROJECT_ID:-$(gcloud config get-value project 2>/dev/null || echo "")}"
+PROJECT_ID="${1:-${GCP_PROJECT_ID:-clinicscribe-515308}}"
 REGION="${GCP_REGION:-asia-south1}"  # Mumbai / India region (DPDP Act compliance)
 ARTIFACT_REPO="clinicscribe-registry"
 ALLOYDB_CLUSTER="clinicscribe-alloydb-cluster"

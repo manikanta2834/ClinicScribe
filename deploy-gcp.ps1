@@ -10,7 +10,7 @@
 # ==============================================================================
 
 param (
-    [string]$ProjectId = $env:GCP_PROJECT_ID,
+    [string]$ProjectId = "clinicscribe-515308",
     [string]$Region = "asia-south1",
     [string]$ArtifactRepo = "clinicscribe-registry",
     [string]$AlloyDBCluster = "clinicscribe-alloydb-cluster",

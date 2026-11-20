@@ -26,7 +26,7 @@ terraform {
 variable "project_id" {
   type        = string
   description = "Google Cloud Project ID"
-  default     = "clinicscribe-prod"
+  default     = "clinicscribe-515308"
 }
 
 variable "region" {

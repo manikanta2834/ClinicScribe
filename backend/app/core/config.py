@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     DB_ECHO: bool = False
 
     # Google Cloud & Enterprise Infrastructure
-    GCP_PROJECT_ID: str = "clinicscribe-prod"
+    GCP_PROJECT_ID: str = "clinicscribe-515308"
     GCP_REGION: str = "asia-south1"  # Mumbai / India region for DPDP Act compliance
 
     # Google Cloud Vertex AI
@@ -37,7 +37,7 @@ class Settings(BaseSettings):
 
     # Google Cloud AlloyDB for PostgreSQL
     ALLOYDB_ENABLED: bool = False  # Set to True when running in GCP environment
-    ALLOYDB_PROJECT_ID: str = "clinicscribe-prod"
+    ALLOYDB_PROJECT_ID: str = "clinicscribe-515308"
     ALLOYDB_REGION: str = "asia-south1"
     ALLOYDB_CLUSTER: str = "clinicscribe-alloydb-cluster"
     ALLOYDB_INSTANCE: str = "clinicscribe-primary-instance"
@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     ALLOYDB_USE_IAM_AUTH: bool = False
 
     # Google Cloud Artifact Registry & Container Images
-    ARTIFACT_REGISTRY_REPO: str = "asia-south1-docker.pkg.dev/clinicscribe-prod/clinicscribe-registry"
+    ARTIFACT_REGISTRY_REPO: str = "asia-south1-docker.pkg.dev/clinicscribe-515308/clinicscribe-registry"
 
     # Google Cloud Storage (GCS)
     GCS_AUDIO_BUCKET: str = "clinicscribe-consultation-audio"
