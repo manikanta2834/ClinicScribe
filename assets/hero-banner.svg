@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#042F2C" />
+      <stop offset="50%" stop-color="#075D55" />
+      <stop offset="100%" stop-color="#0B927F" />
+    </linearGradient>
+
+    <linearGradient id="mesh-grad" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#48B7A0" stop-opacity="0.4" />
+      <stop offset="50%" stop-color="#267C78" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#075D55" stop-opacity="0.8" />
+    </linearGradient>
+
+    <!-- Metallic 3D Text Gradient -->
+    <linearGradient id="text-3d" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="40%" stop-color="#E2F0F1" />
+      <stop offset="70%" stop-color="#BFE1E0" />
+      <stop offset="100%" stop-color="#48B7A0" />
+    </linearGradient>
+
+    <!-- Glowing Accent Gradient -->
+    <linearGradient id="accent-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#48B7A0" />
+      <stop offset="50%" stop-color="#BFE1E0" />
+      <stop offset="100%" stop-color="#0B927F" />
+    </linearGradient>
+
+    <!-- Filters for 3D Lighting & Shadows -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="drop-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#021B19" flood-opacity="0.6" />
+    </filter>
+
+    <!-- Glassmorphic Card Filter -->
+    <filter id="glass-blur">
+      <feGaussianBlur stdDeviation="12" />
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" />
+    </filter>
+
+    <style>
+      @keyframes pulseGlow {
+        0%, 100% { opacity: 0.35; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.08); }
+      }
+      @keyframes ecgMove {
+        0% { stroke-dashoffset: 1200; }
+        100% { stroke-dashoffset: 0; }
+      }
+      @keyframes floatOrb {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-12px) rotate(8deg); }
+      }
+      @keyframes tagPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+      }
+      .pulse-bg { animation: pulseGlow 6s infinite ease-in-out; transform-origin: center; }
+      .ecg-line {
+        stroke-dasharray: 1200;
+        animation: ecgMove 4s linear infinite;
+      }
+      .floating { animation: floatOrb 5s ease-in-out infinite; }
+      .badge-glow { animation: tagPulse 3s ease-in-out infinite; }
+    </style>
+  </defs>
+
+  <!-- Deep Ocean Medical Background -->
+  <rect width="1200" height="420" rx="24" fill="url(#bg-grad)" />
+  <rect width="1200" height="420" rx="24" fill="url(#mesh-grad)" />
+
+  <!-- Ambient Light Orbs -->
+  <circle cx="150" cy="80" r="140" fill="#48B7A0" opacity="0.3" filter="url(#glow)" class="pulse-bg" />
+  <circle cx="1080" cy="340" r="180" fill="#0B927F" opacity="0.25" filter="url(#glow)" class="pulse-bg" />
+  <circle cx="950" cy="90" r="90" fill="#BFE1E0" opacity="0.15" filter="url(#glow)" />
+
+  <!-- Animated Electrocardiogram (ECG) Soundwave -->
+  <path class="ecg-line" d="M 0 210 L 180 210 L 210 185 L 235 245 L 260 160 L 290 280 L 320 200 L 340 210 L 520 210 L 550 170 L 575 250 L 600 130 L 630 300 L 660 190 L 685 210 L 860 210 L 890 180 L 915 240 L 940 150 L 970 270 L 1000 195 L 1025 210 L 1200 210" 
+        fill="none" stroke="#BFE1E0" stroke-width="2.5" opacity="0.35" />
+
+  <!-- Glassmorphic Central Stage -->
+  <g filter="url(#drop-shadow)">
+    <rect x="70" y="45" width="1060" height="330" rx="20" fill="#FFFFFF" fill-opacity="0.08" stroke="#48B7A0" stroke-width="1.5" stroke-opacity="0.35" />
+  </g>
+
+  <!-- Live Deployment Pill Banner -->
+  <g class="badge-glow">
+    <rect x="110" y="75" width="370" height="34" rx="17" fill="#042F2C" fill-opacity="0.8" stroke="#48B7A0" stroke-width="1.5" />
+    <circle cx="130" cy="92" r="5" fill="#48B7A0">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite" />
+    </circle>
+    <text x="146" y="97" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#BFE1E0" letter-spacing="1">
+      LIVE ON GOOGLE CLOUD RUN (ASIA-SOUTH1)
+    </text>
+  </g>
+
+  <!-- Brand Typography -->
+  <text x="110" y="180" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="64" font-weight="900" fill="url(#text-3d)" letter-spacing="-1.5" filter="url(#drop-shadow)">
+    ClinicScribe
+  </text>
+
+  <!-- Animated Stethoscope / AI Scribe Icon (Right Side) -->
+  <g class="floating" transform="translate(890, 75)">
+    <circle cx="100" cy="100" r="85" fill="#075D55" fill-opacity="0.6" stroke="#48B7A0" stroke-width="2" filter="url(#glow)" />
+    <!-- Medical AI Spark Cross -->
+    <path d="M 100 45 L 100 155 M 45 100 L 155 100" stroke="#BFE1E0" stroke-width="14" stroke-linecap="round" />
+    <circle cx="100" cy="100" r="28" fill="#48B7A0" />
+    <circle cx="100" cy="100" r="14" fill="#FFFFFF" />
+    <!-- Gemini 4-Point AI Sparkle -->
+    <path d="M 160 55 Q 160 70 175 70 Q 160 70 160 85 Q 160 70 145 70 Q 160 70 160 55 Z" fill="#FFE082" />
+    <path d="M 50 145 Q 50 155 60 155 Q 50 155 50 165 Q 50 155 40 155 Q 50 155 50 145 Z" fill="#48B7A0" />
+  </g>
+
+  <!-- Subtitle / Tagline -->
+  <text x="112" y="225" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="600" fill="#BFE1E0" letter-spacing="0.5">
+    Turning Conversations into Care.
+  </text>
+
+  <!-- Value Proposition Description -->
+  <text x="112" y="260" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#E2F0F1" opacity="0.85">
+    Transforming multilingual doctor-patient consultations (Tamil • Hindi • English) into doctor-reviewed clinical notes,
+  </text>
+  <text x="112" y="282" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="400" fill="#E2F0F1" opacity="0.85">
+    prescriptions, and patient summaries with Google Vertex AI (Gemini 1.5 Pro) &amp; AlloyDB for PostgreSQL.
+  </text>
+
+  <!-- Feature Badges -->
+  <g transform="translate(112, 312)">
+    <!-- Badge 1: Zero Fabrication -->
+    <rect x="0" y="0" width="175" height="28" rx="14" fill="#042F2C" stroke="#48B7A0" stroke-width="1" />
+    <text x="87" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
+      🛡️ Zero-Fabrication Safety
+    </text>
+
+    <!-- Badge 2: Multilingual Speech -->
+    <rect x="185" y="0" width="185" height="28" rx="14" fill="#042F2C" stroke="#48B7A0" stroke-width="1" />
+    <text x="277" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
+      🌐 Tamil • Hindi • English
+    </text>
+
+    <!-- Badge 3: Doctor-in-Control -->
+    <rect x="380" y="0" width="165" height="28" rx="14" fill="#042F2C" stroke="#48B7A0" stroke-width="1" />
+    <text x="462" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
+      🩺 Doctor-in-Control Gate
+    </text>
+
+    <!-- Badge 4: DPDP Act 2023 -->
+    <rect x="555" y="0" width="180" height="28" rx="14" fill="#042F2C" stroke="#48B7A0" stroke-width="1" />
+    <text x="645" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
+      🇮🇳 DPDP Act 2023 Compliant
+    </text>
+  </g>
+</svg>

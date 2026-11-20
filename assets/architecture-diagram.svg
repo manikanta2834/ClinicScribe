@@ -1,0 +1,178 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 520" width="100%" height="100%">
+  <defs>
+    <linearGradient id="card-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#075D55" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#042F2C" stop-opacity="0.95" />
+    </linearGradient>
+
+    <linearGradient id="stage-bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#021C1A" />
+      <stop offset="100%" stop-color="#053B36" />
+    </linearGradient>
+
+    <linearGradient id="flow-pulse" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#48B7A0" stop-opacity="0" />
+      <stop offset="50%" stop-color="#BFE1E0" stop-opacity="1" />
+      <stop offset="100%" stop-color="#48B7A0" stop-opacity="0" />
+    </linearGradient>
+
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.4" />
+    </filter>
+
+    <filter id="glow-neon">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <style>
+      @keyframes dash {
+        to { stroke-dashoffset: -40; }
+      }
+      @keyframes floatNode {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-6px); }
+      }
+      .flow-line {
+        stroke-dasharray: 8, 8;
+        animation: dash 1.5s linear infinite;
+      }
+      .node-1 { animation: floatNode 4s ease-in-out infinite; }
+      .node-2 { animation: floatNode 4.5s ease-in-out infinite 0.5s; }
+      .node-3 { animation: floatNode 5s ease-in-out infinite 1s; }
+      .node-4 { animation: floatNode 4.2s ease-in-out infinite 1.5s; }
+    </style>
+  </defs>
+
+  <!-- Deep Medical Studio Background -->
+  <rect width="1100" height="520" rx="20" fill="url(#stage-bg)" />
+
+  <!-- Section Header -->
+  <text x="50" y="45" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="20" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">
+    ClinicScribe Enterprise Cloud Architecture &amp; Data Pipeline
+  </text>
+  <text x="50" y="70" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="500" fill="#48B7A0">
+    Google Cloud Run • Vertex AI (Gemini 1.5 Pro) • AlloyDB for PostgreSQL • DPDP Act 2023 Compliant (asia-south1)
+  </text>
+
+  <!-- Connection Flowlines with Animated Dashes -->
+  <path class="flow-line" d="M 230 240 L 310 240" fill="none" stroke="#48B7A0" stroke-width="3" />
+  <path class="flow-line" d="M 510 240 L 590 240" fill="none" stroke="#48B7A0" stroke-width="3" />
+  <path class="flow-line" d="M 790 240 L 870 240" fill="none" stroke="#48B7A0" stroke-width="3" />
+
+  <!-- Feedback / Doctor-in-Control Verification Loop -->
+  <path class="flow-line" d="M 690 320 L 690 420 L 410 420 L 410 320" fill="none" stroke="#BFE1E0" stroke-width="2.5" />
+  <rect x="480" y="405" width="220" height="28" rx="14" fill="#042F2C" stroke="#BFE1E0" stroke-width="1.5" />
+  <text x="590" y="423" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#BFE1E0">
+    🩺 Doctor Review &amp; Sign-off Loop
+  </text>
+
+  <!-- Node 1: Clinical Audio & Consultation Capture (Left) -->
+  <g class="node-1" transform="translate(50, 120)" filter="url(#shadow)">
+    <rect width="180" height="240" rx="16" fill="url(#card-bg)" stroke="#48B7A0" stroke-width="1.5" />
+    <circle cx="90" cy="50" r="28" fill="#0B927F" opacity="0.3" filter="url(#glow-neon)" />
+    <text x="90" y="58" text-anchor="middle" font-size="24">🎙️</text>
+    <text x="90" y="105" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">
+      Consultation Audio
+    </text>
+    <text x="90" y="125" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" font-weight="600" fill="#48B7A0">
+      INPUT INGESTION
+    </text>
+    <rect x="18" y="145" width="144" height="22" rx="6" fill="#042F2C" />
+    <text x="90" y="160" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#BFE1E0">
+      Tamil • Tanglish
+    </text>
+    <rect x="18" y="175" width="144" height="22" rx="6" fill="#042F2C" />
+    <text x="90" y="190" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#BFE1E0">
+      Hindi • Hinglish
+    </text>
+    <rect x="18" y="205" width="144" height="22" rx="6" fill="#042F2C" />
+    <text x="90" y="220" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#BFE1E0">
+      English (India)
+    </text>
+  </g>
+
+  <!-- Node 2: Web App & Cloud Run Ingress (Mid-Left) -->
+  <g class="node-2" transform="translate(310, 120)" filter="url(#shadow)">
+    <rect width="200" height="240" rx="16" fill="url(#card-bg)" stroke="#48B7A0" stroke-width="1.5" />
+    <circle cx="100" cy="50" r="28" fill="#48B7A0" opacity="0.3" filter="url(#glow-neon)" />
+    <text x="100" y="58" text-anchor="middle" font-size="24">⚡</text>
+    <text x="100" y="105" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">
+      Next.js 14 Frontend
+    </text>
+    <text x="100" y="125" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" font-weight="600" fill="#48B7A0">
+      GOOGLE CLOUD RUN
+    </text>
+    <rect x="18" y="145" width="164" height="22" rx="6" fill="#042F2C" />
+    <text x="100" y="160" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#BFE1E0">
+      Glassmorphism UI
+    </text>
+    <rect x="18" y="175" width="164" height="22" rx="6" fill="#042F2C" />
+    <text x="100" y="190" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#BFE1E0">
+      Real-Time Soundwave
+    </text>
+    <rect x="18" y="205" width="164" height="22" rx="6" fill="#042F2C" />
+    <text x="100" y="220" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#BFE1E0">
+      Doctor Review Workspace
+    </text>
+  </g>
+
+  <!-- Node 3: AI Scribe & Vertex AI Processing (Mid-Right) -->
+  <g class="node-3" transform="translate(590, 120)" filter="url(#shadow)">
+    <rect width="200" height="240" rx="16" fill="url(#card-bg)" stroke="#BFE1E0" stroke-width="1.5" />
+    <circle cx="100" cy="50" r="28" fill="#FFE082" opacity="0.3" filter="url(#glow-neon)" />
+    <text x="100" y="58" text-anchor="middle" font-size="24">✨</text>
+    <text x="100" y="105" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">
+      Vertex AI Engine
+    </text>
+    <text x="100" y="125" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" font-weight="600" fill="#FFE082">
+      GEMINI 1.5 PRO
+    </text>
+    <rect x="18" y="145" width="164" height="22" rx="6" fill="#042F2C" />
+    <text x="100" y="160" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#FFE082">
+      🛡️ Zero-Fabrication Gate
+    </text>
+    <rect x="18" y="175" width="164" height="22" rx="6" fill="#042F2C" />
+    <text x="100" y="190" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#BFE1E0">
+      SOAP Clinical Schema
+    </text>
+    <rect x="18" y="205" width="164" height="22" rx="6" fill="#042F2C" />
+    <text x="100" y="220" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#BFE1E0">
+      Missing Info &amp; Doubts
+    </text>
+  </g>
+
+  <!-- Node 4: Persistence & Clinical Output (Right) -->
+  <g class="node-4" transform="translate(870, 120)" filter="url(#shadow)">
+    <rect width="180" height="240" rx="16" fill="url(#card-bg)" stroke="#48B7A0" stroke-width="1.5" />
+    <circle cx="90" cy="50" r="28" fill="#0B927F" opacity="0.3" filter="url(#glow-neon)" />
+    <text x="90" y="58" text-anchor="middle" font-size="24">🗄️</text>
+    <text x="90" y="105" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">
+      AlloyDB &amp; Reports
+    </text>
+    <text x="90" y="125" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" font-weight="600" fill="#48B7A0">
+      STORAGE &amp; EXPORTS
+    </text>
+    <rect x="18" y="145" width="144" height="22" rx="6" fill="#042F2C" />
+    <text x="90" y="160" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#BFE1E0">
+      AlloyDB PostgreSQL
+    </text>
+    <rect x="18" y="175" width="144" height="22" rx="6" fill="#042F2C" />
+    <text x="90" y="190" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#BFE1E0">
+      ReportLab PDF Rx
+    </text>
+    <rect x="18" y="205" width="144" height="22" rx="6" fill="#042F2C" />
+    <text x="90" y="220" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#BFE1E0">
+      Tamil/Hindi Summaries
+    </text>
+  </g>
+
+  <!-- Bottom Regulatory Compliance Bar -->
+  <rect x="50" y="465" width="1000" height="34" rx="10" fill="#021C1A" stroke="#48B7A0" stroke-width="1" />
+  <text x="550" y="487" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
+    🔒 DPDP Act 2023 &amp; DISHA Compliant • SHA-256 Consent Audit Log • Multi-Tenant Isolation • Encryption in Transit &amp; at Rest
+  </text>
+</svg>
