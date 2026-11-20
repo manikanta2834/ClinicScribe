@@ -7,243 +7,193 @@
       <stop offset="100%" stop-color="#074842" />
     </linearGradient>
 
-    <!-- 3D Card Gradients -->
-    <linearGradient id="card-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#08635B" stop-opacity="0.95" />
-      <stop offset="100%" stop-color="#032B28" stop-opacity="0.98" />
+    <!-- Card 1 & 2 & 4 Gradient (Deep Teal Glass) -->
+    <linearGradient id="card-teal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#095C54" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#032B27" stop-opacity="0.98" />
     </linearGradient>
 
-    <linearGradient id="card-grad-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Card 3 Gradient (Vertex AI Gold Glow) -->
+    <linearGradient id="card-gold" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#0A5B53" stop-opacity="0.95" />
-      <stop offset="100%" stop-color="#04332F" stop-opacity="0.98" />
+      <stop offset="100%" stop-color="#05332F" stop-opacity="0.98" />
     </linearGradient>
 
-    <!-- Metallic Edge Highlight -->
-    <linearGradient id="edge-light" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Edge Highlight -->
+    <linearGradient id="edge-highlight" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#BFE1E0" stop-opacity="0.8" />
       <stop offset="50%" stop-color="#48B7A0" stop-opacity="0.3" />
       <stop offset="100%" stop-color="#0B927F" stop-opacity="0.6" />
     </linearGradient>
 
-    <!-- Neon Glow Filter -->
-    <filter id="neon-glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="6" result="blur" />
+    <filter id="card-shadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000000" flood-opacity="0.5" />
+    </filter>
+
+    <filter id="soft-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
       <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
 
-    <filter id="card-shadow" x="-15%" y="-15%" width="130%" height="130%">
-      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#000000" flood-opacity="0.55" />
-    </filter>
-
     <style>
-      .flow-path {
+      .flow-pulse {
         stroke-dasharray: 8, 8;
-        animation: flowDash 1.2s linear infinite;
+        animation: dashMove 1.4s linear infinite;
       }
-      @keyframes flowDash {
+      @keyframes dashMove {
         to { stroke-dashoffset: -32; }
       }
     </style>
   </defs>
 
-  <!-- Canvas Background -->
-  <rect width="1140" height="540" rx="20" fill="url(#arch-bg)" />
+  <!-- Background -->
+  <rect x="0" y="0" width="1140" height="540" rx="20" fill="url(#arch-bg)" />
 
-  <!-- Grid Pattern Overlay for Depth -->
-  <g opacity="0.08" stroke="#48B7A0" stroke-width="1">
-    <line x1="0" y1="90" x2="1140" y2="90" />
-    <line x1="0" y1="180" x2="1140" y2="180" />
-    <line x1="0" y1="270" x2="1140" y2="270" />
-    <line x1="0" y1="360" x2="1140" y2="360" />
-    <line x1="0" y1="450" x2="1140" y2="450" />
-    <line x1="285" y1="0" x2="285" y2="540" />
-    <line x1="570" y1="0" x2="570" y2="540" />
-    <line x1="855" y1="0" x2="855" y2="540" />
-  </g>
+  <!-- Ambient Light Glow Behind Cards -->
+  <circle cx="155" cy="250" r="130" fill="#48B7A0" opacity="0.12" filter="url(#soft-glow)" />
+  <circle cx="430" cy="250" r="130" fill="#48B7A0" opacity="0.10" filter="url(#soft-glow)" />
+  <circle cx="705" cy="250" r="140" fill="#FFE082" opacity="0.12" filter="url(#soft-glow)" />
+  <circle cx="980" cy="250" r="130" fill="#0B927F" opacity="0.12" filter="url(#soft-glow)" />
 
-  <!-- Ambient Light Halos -->
-  <circle cx="150" cy="240" r="120" fill="#48B7A0" opacity="0.12" filter="url(#neon-glow)" />
-  <circle cx="680" cy="240" r="140" fill="#FFE082" opacity="0.09" filter="url(#neon-glow)" />
-  <circle cx="980" cy="240" r="120" fill="#0B927F" opacity="0.12" filter="url(#neon-glow)" />
-
-  <!-- Header Text -->
+  <!-- Header Section -->
   <text x="50" y="48" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="900" fill="#FFFFFF" letter-spacing="0.5">
-    ClinicScribe Enterprise Cloud Architecture &amp; Data Pipeline
+    Enterprise Cloud Architecture &amp; Data Pipeline
   </text>
   <text x="50" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#48B7A0">
     Google Cloud Run (Next.js &amp; FastAPI) • Vertex AI (Gemini 1.5 Pro) • AlloyDB for PostgreSQL • asia-south1 (Mumbai)
   </text>
 
-  <!-- Data Flow Connecting Lines -->
-  <!-- Line 1 to 2 -->
-  <path class="flow-path" d="M 260 250 L 320 250" fill="none" stroke="#48B7A0" stroke-width="3" />
-  <circle cx="290" cy="250" r="4" fill="#BFE1E0">
-    <animate attributeName="cx" values="260;320" dur="1.2s" repeatCount="indefinite" />
+  <!-- ============================================================== -->
+  <!-- CONNECTING DATA PIPELINES                                      -->
+  <!-- ============================================================== -->
+  <!-- Line 1: Audio -> Next.js -->
+  <path class="flow-pulse" d="M 270 250 L 315 250" fill="none" stroke="#48B7A0" stroke-width="3.5" />
+  <circle cx="292" cy="250" r="4.5" fill="#BFE1E0">
+    <animate attributeName="cx" values="270;315" dur="1.2s" repeatCount="indefinite" />
   </circle>
 
-  <!-- Line 2 to 3 -->
-  <path class="flow-path" d="M 540 250 L 600 250" fill="none" stroke="#48B7A0" stroke-width="3" />
-  <circle cx="570" cy="250" r="4" fill="#FFE082">
-    <animate attributeName="cx" values="540;600" dur="1.2s" repeatCount="indefinite" />
+  <!-- Line 2: Next.js -> Vertex AI -->
+  <path class="flow-pulse" d="M 545 250 L 590 250" fill="none" stroke="#48B7A0" stroke-width="3.5" />
+  <circle cx="567" cy="250" r="4.5" fill="#FFE082">
+    <animate attributeName="cx" values="545;590" dur="1.2s" repeatCount="indefinite" />
   </circle>
 
-  <!-- Line 3 to 4 -->
-  <path class="flow-path" d="M 820 250 L 880 250" fill="none" stroke="#48B7A0" stroke-width="3" />
-  <circle cx="850" cy="250" r="4" fill="#48B7A0">
-    <animate attributeName="cx" values="820;880" dur="1.2s" repeatCount="indefinite" />
+  <!-- Line 3: Vertex AI -> AlloyDB -->
+  <path class="flow-pulse" d="M 820 250 L 865 250" fill="none" stroke="#48B7A0" stroke-width="3.5" />
+  <circle cx="842" cy="250" r="4.5" fill="#48B7A0">
+    <animate attributeName="cx" values="820;865" dur="1.2s" repeatCount="indefinite" />
   </circle>
 
-  <!-- Doctor-in-Control Feedback Loop (Returns to Node 2) -->
-  <path class="flow-path" d="M 710 375 L 710 435 L 430 435 L 430 375" fill="none" stroke="#BFE1E0" stroke-width="2" />
-  <g transform="translate(500, 420)">
-    <rect x="-10" y="-2" width="220" height="28" rx="14" fill="#021C1A" stroke="#BFE1E0" stroke-width="1.5" />
-    <text x="100" y="16" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#BFE1E0">
-      🩺 Doctor Review &amp; Sign-Off Gate
-    </text>
-  </g>
+  <!-- Feedback Loop: Doctor Sign-Off -> Workspace -->
+  <path class="flow-pulse" d="M 705 385 L 705 435 L 430 435 L 430 385" fill="none" stroke="#BFE1E0" stroke-width="2.5" />
+  <rect x="500" y="420" width="220" height="30" rx="15" fill="#021C1A" stroke="#BFE1E0" stroke-width="1.5" />
+  <text x="610" y="439" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#BFE1E0">
+    🩺 Doctor Review &amp; Sign-off Loop
+  </text>
 
   <!-- ============================================================== -->
-  <!-- NODE 1: Consultation Audio Capture (x = 40)                    -->
+  <!-- CARD 1: Audio Ingestion (Explicit x="40")                      -->
   <!-- ============================================================== -->
-  <g transform="translate(40, 115)" filter="url(#card-shadow)">
-    <!-- Gentle Float Animation -->
-    <animateTransform attributeName="transform" type="translate" values="40,115; 40,110; 40,115" dur="4s" repeatCount="indefinite" />
-    
-    <rect width="220" height="260" rx="18" fill="url(#card-grad)" stroke="url(#edge-light)" stroke-width="1.5" />
-    
-    <!-- Header Icon -->
-    <circle cx="110" cy="50" r="26" fill="#042F2C" stroke="#48B7A0" stroke-width="1.5" />
-    <text x="110" y="58" text-anchor="middle" font-size="22">🎙️</text>
-    
-    <text x="110" y="105" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF">
-      Consultation Audio
-    </text>
-    <text x="110" y="125" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" font-weight="700" fill="#48B7A0" letter-spacing="1">
-      INPUT INGESTION
-    </text>
-
-    <!-- Pills -->
-    <rect x="20" y="145" width="180" height="24" rx="8" fill="#021C1A" stroke="#075D55" />
-    <text x="110" y="161" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
-      Tamil / Tanglish Dialogue
-    </text>
-
-    <rect x="20" y="177" width="180" height="24" rx="8" fill="#021C1A" stroke="#075D55" />
-    <text x="110" y="193" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
-      Hindi / Hinglish Dialogue
-    </text>
-
-    <rect x="20" y="209" width="180" height="24" rx="8" fill="#021C1A" stroke="#075D55" />
-    <text x="110" y="225" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
-      Indian English Outpatient
-    </text>
-  </g>
+  <rect x="40" y="115" width="230" height="270" rx="18" fill="url(#card-teal)" stroke="url(#edge-highlight)" stroke-width="1.5" filter="url(#card-shadow)" />
+  <circle cx="155" cy="165" r="26" fill="#042F2C" stroke="#48B7A0" stroke-width="1.5" />
+  <text x="155" y="173" text-anchor="middle" font-size="22">🎙️</text>
+  <text x="155" y="215" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF">
+    Consultation Audio
+  </text>
+  <text x="155" y="235" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" font-weight="700" fill="#48B7A0" letter-spacing="1">
+    INPUT INGESTION
+  </text>
+  <rect x="55" y="255" width="200" height="26" rx="8" fill="#021C1A" stroke="#075D55" />
+  <text x="155" y="272" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
+    Tamil / Tanglish Dialogue
+  </text>
+  <rect x="55" y="289" width="200" height="26" rx="8" fill="#021C1A" stroke="#075D55" />
+  <text x="155" y="306" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
+    Hindi / Hinglish Dialogue
+  </text>
+  <rect x="55" y="323" width="200" height="26" rx="8" fill="#021C1A" stroke="#075D55" />
+  <text x="155" y="340" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
+    Indian English Outpatient
+  </text>
 
   <!-- ============================================================== -->
-  <!-- NODE 2: Google Cloud Run Frontend (x = 320)                    -->
+  <!-- CARD 2: Next.js Frontend (Explicit x="315")                    -->
   <!-- ============================================================== -->
-  <g transform="translate(320, 115)" filter="url(#card-shadow)">
-    <animateTransform attributeName="transform" type="translate" values="320,115; 320,109; 320,115" dur="4.4s" repeatCount="indefinite" />
-
-    <rect width="220" height="260" rx="18" fill="url(#card-grad)" stroke="url(#edge-light)" stroke-width="1.5" />
-
-    <circle cx="110" cy="50" r="26" fill="#042F2C" stroke="#48B7A0" stroke-width="1.5" />
-    <text x="110" y="58" text-anchor="middle" font-size="22">⚡</text>
-
-    <text x="110" y="105" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF">
-      Next.js 14 Frontend
-    </text>
-    <text x="110" y="125" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" font-weight="700" fill="#48B7A0" letter-spacing="1">
-      GOOGLE CLOUD RUN
-    </text>
-
-    <rect x="20" y="145" width="180" height="24" rx="8" fill="#021C1A" stroke="#075D55" />
-    <text x="110" y="161" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
-      Live Soundwave Meter
-    </text>
-
-    <rect x="20" y="177" width="180" height="24" rx="8" fill="#021C1A" stroke="#075D55" />
-    <text x="110" y="193" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
-      Doctor Review Workspace
-    </text>
-
-    <rect x="20" y="209" width="180" height="24" rx="8" fill="#021C1A" stroke="#075D55" />
-    <text x="110" y="225" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
-      Web Speech Recognition
-    </text>
-  </g>
+  <rect x="315" y="115" width="230" height="270" rx="18" fill="url(#card-teal)" stroke="url(#edge-highlight)" stroke-width="1.5" filter="url(#card-shadow)" />
+  <circle cx="430" cy="165" r="26" fill="#042F2C" stroke="#48B7A0" stroke-width="1.5" />
+  <text x="430" y="173" text-anchor="middle" font-size="22">⚡</text>
+  <text x="430" y="215" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF">
+    Next.js 14 Frontend
+  </text>
+  <text x="430" y="235" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" font-weight="700" fill="#48B7A0" letter-spacing="1">
+    GOOGLE CLOUD RUN
+  </text>
+  <rect x="330" y="255" width="200" height="26" rx="8" fill="#021C1A" stroke="#075D55" />
+  <text x="430" y="272" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
+    Live Soundwave Meter
+  </text>
+  <rect x="330" y="289" width="200" height="26" rx="8" fill="#021C1A" stroke="#075D55" />
+  <text x="430" y="306" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
+    Doctor Review Workspace
+  </text>
+  <rect x="330" y="323" width="200" height="26" rx="8" fill="#021C1A" stroke="#075D55" />
+  <text x="430" y="340" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
+    Web Speech Recognition
+  </text>
 
   <!-- ============================================================== -->
-  <!-- NODE 3: Vertex AI Gemini 1.5 Pro (x = 600)                     -->
+  <!-- CARD 3: Vertex AI Gemini (Explicit x="590")                    -->
   <!-- ============================================================== -->
-  <g transform="translate(600, 115)" filter="url(#card-shadow)">
-    <animateTransform attributeName="transform" type="translate" values="600,115; 600,108; 600,115" dur="4.8s" repeatCount="indefinite" />
-
-    <rect width="220" height="260" rx="18" fill="url(#card-grad-gold)" stroke="#FFE082" stroke-width="1.8" />
-
-    <circle cx="110" cy="50" r="26" fill="#042F2C" stroke="#FFE082" stroke-width="1.5" />
-    <text x="110" y="58" text-anchor="middle" font-size="22">✨</text>
-
-    <text x="110" y="105" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF">
-      Vertex AI Engine
-    </text>
-    <text x="110" y="125" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" font-weight="700" fill="#FFE082" letter-spacing="1">
-      GEMINI 1.5 PRO
-    </text>
-
-    <rect x="20" y="145" width="180" height="24" rx="8" fill="#021C1A" stroke="#5D4C07" />
-    <text x="110" y="161" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#FFE082">
-      🛡️ Zero-Fabrication Gate
-    </text>
-
-    <rect x="20" y="177" width="180" height="24" rx="8" fill="#021C1A" stroke="#5D4C07" />
-    <text x="110" y="193" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#FFE082">
-      Structured SOAP Schema
-    </text>
-
-    <rect x="20" y="209" width="180" height="24" rx="8" fill="#021C1A" stroke="#5D4C07" />
-    <text x="110" y="225" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#FFE082">
-      Uncertainty &amp; Missing Info
-    </text>
-  </g>
+  <rect x="590" y="115" width="230" height="270" rx="18" fill="url(#card-gold)" stroke="#FFE082" stroke-width="2" filter="url(#card-shadow)" />
+  <circle cx="705" cy="165" r="26" fill="#042F2C" stroke="#FFE082" stroke-width="1.5" />
+  <text x="705" y="173" text-anchor="middle" font-size="22">✨</text>
+  <text x="705" y="215" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF">
+    Vertex AI Engine
+  </text>
+  <text x="705" y="235" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" font-weight="700" fill="#FFE082" letter-spacing="1">
+    GEMINI 1.5 PRO
+  </text>
+  <rect x="605" y="255" width="200" height="26" rx="8" fill="#021C1A" stroke="#5D4C07" />
+  <text x="705" y="272" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#FFE082">
+    🛡️ Zero-Fabrication Gate
+  </text>
+  <rect x="605" y="289" width="200" height="26" rx="8" fill="#021C1A" stroke="#5D4C07" />
+  <text x="705" y="306" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#FFE082">
+    Structured SOAP Schema
+  </text>
+  <rect x="605" y="323" width="200" height="26" rx="8" fill="#021C1A" stroke="#5D4C07" />
+  <text x="705" y="340" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#FFE082">
+    Uncertainty &amp; Missing Info
+  </text>
 
   <!-- ============================================================== -->
-  <!-- NODE 4: AlloyDB & Report Exports (x = 880)                     -->
+  <!-- CARD 4: AlloyDB & Exports (Explicit x="865")                   -->
   <!-- ============================================================== -->
-  <g transform="translate(880, 115)" filter="url(#card-shadow)">
-    <animateTransform attributeName="transform" type="translate" values="880,115; 880,111; 880,115" dur="4.2s" repeatCount="indefinite" />
-
-    <rect width="220" height="260" rx="18" fill="url(#card-grad)" stroke="url(#edge-light)" stroke-width="1.5" />
-
-    <circle cx="110" cy="50" r="26" fill="#042F2C" stroke="#48B7A0" stroke-width="1.5" />
-    <text x="110" y="58" text-anchor="middle" font-size="22">🗄️</text>
-
-    <text x="110" y="105" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF">
-      AlloyDB &amp; Reports
-    </text>
-    <text x="110" y="125" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" font-weight="700" fill="#48B7A0" letter-spacing="1">
-      STORAGE &amp; EXPORTS
-    </text>
-
-    <rect x="20" y="145" width="180" height="24" rx="8" fill="#021C1A" stroke="#075D55" />
-    <text x="110" y="161" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
-      AlloyDB PostgreSQL (pgvector)
-    </text>
-
-    <rect x="20" y="177" width="180" height="24" rx="8" fill="#021C1A" stroke="#075D55" />
-    <text x="110" y="193" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
-      ReportLab Prescription PDF
-    </text>
-
-    <rect x="20" y="209" width="180" height="24" rx="8" fill="#021C1A" stroke="#075D55" />
-    <text x="110" y="225" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
-      Tamil • Hindi Summaries
-    </text>
-  </g>
+  <rect x="865" y="115" width="230" height="270" rx="18" fill="url(#card-teal)" stroke="url(#edge-highlight)" stroke-width="1.5" filter="url(#card-shadow)" />
+  <circle cx="980" cy="165" r="26" fill="#042F2C" stroke="#48B7A0" stroke-width="1.5" />
+  <text x="980" y="173" text-anchor="middle" font-size="22">🗄️</text>
+  <text x="980" y="215" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF">
+    AlloyDB &amp; Reports
+  </text>
+  <text x="980" y="235" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" font-weight="700" fill="#48B7A0" letter-spacing="1">
+    STORAGE &amp; EXPORTS
+  </text>
+  <rect x="880" y="255" width="200" height="26" rx="8" fill="#021C1A" stroke="#075D55" />
+  <text x="980" y="272" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
+    AlloyDB PostgreSQL (pgvector)
+  </text>
+  <rect x="880" y="289" width="200" height="26" rx="8" fill="#021C1A" stroke="#075D55" />
+  <text x="980" y="306" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
+    ReportLab Prescription PDF
+  </text>
+  <rect x="880" y="323" width="200" height="26" rx="8" fill="#021C1A" stroke="#075D55" />
+  <text x="980" y="340" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#BFE1E0">
+    Tamil • Hindi Summaries
+  </text>
 
   <!-- Bottom Regulatory Compliance Bar -->
-  <rect x="40" y="480" width="1060" height="34" rx="10" fill="#021C1A" stroke="#48B7A0" stroke-width="1" />
-  <text x="570" y="502" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#BFE1E0">
+  <rect x="40" y="480" width="1055" height="34" rx="10" fill="#021C1A" stroke="#48B7A0" stroke-width="1" />
+  <text x="567" y="502" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#BFE1E0">
     🔒 DPDP Act 2023 &amp; DISHA Compliant • SHA-256 Consent Audit Log • Multi-Tenant Data Isolation • asia-south1 (Mumbai)
   </text>
 </svg>

@@ -61,7 +61,7 @@ In outpatient clinics across India, physicians spend upwards of **40% of their c
 ## 🏛️ Enterprise Architecture & Data Pipeline
 
 <div align="center">
-  <img src="assets/architecture-diagram.svg" alt="ClinicScribe Architecture Pipeline" width="100%" />
+  <img src="assets/architecture-diagram.svg?v=3" alt="ClinicScribe Architecture Pipeline" width="100%" />
 </div>
 
 ### Architectural Highlights
