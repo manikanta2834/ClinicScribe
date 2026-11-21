@@ -45,6 +45,8 @@ gcloud run deploy clinicscribe-api \
   --platform=managed \
   --allow-unauthenticated \
   --port=8000 \
+  --memory=1Gi \
+  --cpu=1 \
   --set-env-vars=ENVIRONMENT=production,USE_VERTEX_AI=true,GCP_PROJECT_ID=${PROJECT_ID},GCP_REGION=${REGION},VERTEX_AI_LOCATION=${REGION} \
   --project="${PROJECT_ID}"
 
@@ -58,6 +60,8 @@ gcloud run deploy clinicscribe-web \
   --platform=managed \
   --allow-unauthenticated \
   --port=3000 \
+  --memory=1Gi \
+  --cpu=1 \
   --set-env-vars=NODE_ENV=production,NEXT_PUBLIC_API_URL=${BACKEND_URL} \
   --project="${PROJECT_ID}"
 

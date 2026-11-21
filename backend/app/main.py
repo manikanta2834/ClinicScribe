@@ -10,6 +10,15 @@ from app.api.v1.api import api_router
 async def lifespan(app: FastAPI):
     # Startup setup
     setup_logging()
+    try:
+        from app.models.base import Base
+        from app.models import clinic, user, patient, consultation, clinical_note, audit_log  # noqa: F401
+        from app.core.database import engine
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Database schema auto-init notice: {e}")
     yield
     # Graceful shutdown
 
@@ -41,6 +50,11 @@ async def root():
         "version": settings.VERSION,
         "docs_url": f"{settings.API_V1_STR}/docs",
     }
+
+@app.get("/health", tags=["Root"])
+@app.get("/api/v1/healthz", tags=["Root"])
+async def health_check():
+    return {"status": "ok", "service": "ClinicScribe API"}
 
 # Register API v1 router
 app.include_router(api_router, prefix=settings.API_V1_STR)
